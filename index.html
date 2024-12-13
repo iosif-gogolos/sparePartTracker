@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ersatzteile Verwaltung</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.1.0/modern-normalize.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        .form-container label {
+            font-weight: bold;
+        }
+        .form-container input, .form-container select, .form-container button {
+            padding: 0.5rem;
+            font-size: 1rem;
+        }
+        .form-container button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ersatzteile Verwaltung</h1>
+        
+        <form id="addPartForm" class="form-container">
+            <label for="licensePlate">Kennzeichen</label>
+            <input type="text" id="licensePlate" placeholder="Kennzeichen" required>
+
+            <label for="partNumber">Teilenummer</label>
+            <input type="text" id="partNumber" placeholder="Teilenummer" required>
+
+            <label for="description">Beschreibung</label>
+            <input type="text" id="description" placeholder="Beschreibung">
+
+            <label for="complaintDate">Reklamationsdatum</label>
+            <input type="date" id="complaintDate" required>
+
+            <label for="reason">Grund</label>
+            <select id="reason">
+                <option value="Beschädigt">Beschädigt</option>
+                <option value="Falsch geliefert">Falsch geliefert</option>
+            </select>
+
+            <label for="price">Preis</label>
+            <input type="text" id="price" placeholder="Preis">
+
+            <label for="remarks">Bemerkung</label>
+            <input type="text" id="remarks" placeholder="Bemerkung">
+
+            <label for="creditAvailable">Gutschrift vorhanden</label>
+            <select id="creditAvailable">
+                <option value="Ja">Ja</option>
+                <option value="Nein" selected>Nein</option>
+            </select>
+
+            <button type="submit">Hinzufügen</button>
+        </form>
+
+        <table id="partsTable">
+            <thead>
+                <tr>
+                    <th>Kennzeichen</th>
+                    <th>Teilenummer</th>
+                    <th>Beschreibung</th>
+                    <th>Reklamationsdatum</th>
+                    <th>Grund</th>
+                    <th>Preis</th>
+                    <th>Bemerkung</th>
+                    <th>Gutschrift vorhanden</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamische Inhalte werden hier hinzugefügt -->
+            </tbody>
+        </table>
+
+        <button id="exportButton" class="hidden">Exportieren als Excel</button>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        const addPartForm = document.getElementById('addPartForm');
+        const partsTableBody = document.querySelector('#partsTable tbody');
+        const exportButton = document.getElementById('exportButton');
+    
+        // Hinzufügen eines neuen Eintrags zur Tabelle
+        addPartForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+    
+            const newPart = {
+                licensePlate: document.getElementById('licensePlate').value,
+                partNumber: document.getElementById('partNumber').value.toString(), // Ensure partNumber is treated as a string
+                description: document.getElementById('description').value,
+                complaintDate: document.getElementById('complaintDate').value, // Date in YYYY-MM-DD format
+                reason: document.getElementById('reason').value,
+                price: document.getElementById('price').value,
+                remarks: document.getElementById('remarks').value,
+                creditAvailable: document.getElementById('creditAvailable').value,
+            };
+    
+            const newRow = document.createElement('tr');
+    
+            for (const key in newPart) {
+                const cell = document.createElement('td');
+                // Format date for display in the table
+                if (key === 'complaintDate' && newPart[key]) {
+                    const date = new Date(newPart[key]);
+                    cell.textContent = date.toLocaleDateString('de-DE'); // Display as DD.MM.YYYY
+                } else {
+                    cell.textContent = newPart[key];
+                }
+                newRow.appendChild(cell);
+            }
+    
+            partsTableBody.appendChild(newRow);
+    
+            // Show the export button if there is at least one entry
+            if (partsTableBody.children.length > 0) {
+                exportButton.classList.remove('hidden');
+            }
+    
+            addPartForm.reset();
+        });
+    
+        // Exportieren der Tabelle in eine Excel-Datei
+        exportButton.addEventListener('click', () => {
+            const table = document.getElementById('partsTable');
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Ersatzteile" });
+    
+            // Access the worksheet
+            const sheet = wb.Sheets["Ersatzteile"];
+            const range = XLSX.utils.decode_range(sheet['!ref']);
+    
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    const cell_address = { c: C, r: R };
+                    const cell_ref = XLSX.utils.encode_cell(cell_address);
+    
+                    if (sheet[cell_ref]) {
+                        // Format "Reklamationsdatum" column (4th column, index 3)
+                        if (C === 3 && R > 0) {
+                            const cellValue = sheet[cell_ref].v;
+    
+                            // Validate and format the date value
+                            if (Date.parse(cellValue)) {
+                                const date = new Date(cellValue);
+                                const formattedDate = date.toLocaleDateString('de-DE'); // Convert to DD.MM.YYYY
+                                sheet[cell_ref].v = formattedDate; // Update cell value
+                            }
+                        }
+    
+                        sheet[cell_ref].t = 's'; // Treat all cells as strings
+                    }
+                }
+            }
+    
+            // Write the file
+            XLSX.writeFile(wb, 'ersatzteile.xlsx');
+        });
+    
+        // Dynamische Inhalte hier: Beispiel für Filterbarkeit der Spalten
+        document.querySelectorAll('#partsTable thead th').forEach((header, index) => {
+            header.addEventListener('click', () => {
+                const rows = Array.from(partsTableBody.querySelectorAll('tr'));
+                const isAscending = header.dataset.order === 'asc';
+                header.dataset.order = isAscending ? 'desc' : 'asc';
+    
+                rows.sort((rowA, rowB) => {
+                    const cellA = rowA.children[index].textContent.trim().toLowerCase();
+                    const cellB = rowB.children[index].textContent.trim().toLowerCase();
+    
+                    return isAscending
+                        ? cellA.localeCompare(cellB)
+                        : cellB.localeCompare(cellA);
+                });
+    
+                rows.forEach(row => partsTableBody.appendChild(row));
+            });
+        });
+    </script>
+    
+
+</body>
+</html>
