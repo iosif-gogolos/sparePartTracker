@@ -61,7 +61,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Ersatzteile Verwaltung</h1>
+        <h1>Ersatzteil-Tracker Markgröningen</h1>
         
         <form id="addPartForm" class="form-container">
             <label for="licensePlate">Kennzeichen</label>
@@ -115,20 +115,21 @@
             </tbody>
         </table>
 
-        <button id="exportButton" class="hidden">Exportieren als Excel</button>
+        <button id="exportButton" class="hidden">Liste Exportieren</button>
 
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
     <script>
         const addPartForm = document.getElementById('addPartForm');
         const partsTableBody = document.querySelector('#partsTable tbody');
         const exportButton = document.getElementById('exportButton');
     
         // Backend-URL
-        const backendUrl = 'http://localhost:80'; // Ersetze durch deine tatsächliche URL
-    
-        // Hinzufügen eines neuen Eintrags zur Tabelle und Senden an Backend
+        const backendUrl = 'http://localhost:80/add-part';
+                // Hinzufügen eines neuen Eintrags zur Tabelle und Senden an Backend
         addPartForm.addEventListener('submit', async (event) => {
             event.preventDefault();
     
@@ -190,13 +191,12 @@
             const table = document.getElementById('partsTable');
             const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Ersatzteile" });
             if (isSafari) {
-                const wb = XLSX.utils.table_to_book(table, { sheet: "Ersatzteile" });
                 const csv = XLSX.utils.sheet_to_csv(wb.Sheets["Ersatzteile"]);
                 const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                 saveAs(blob, 'ersatzteile.csv');
             } else {            
-                const wb = XLSX.utils.table_to_book(table, { sheet: "Ersatzteile" });
                 XLSX.writeFile(wb, 'ersatzteile.xlsx');
             }
         });
