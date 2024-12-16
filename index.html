@@ -126,13 +126,14 @@
         const addPartForm = document.getElementById('addPartForm');
         const partsTableBody = document.querySelector('#partsTable tbody');
         const exportButton = document.getElementById('exportButton');
-    
+
         // Backend-URL
         const backendUrl = 'http://localhost:80/add-part';
-                // Hinzufügen eines neuen Eintrags zur Tabelle und Senden an Backend
+
+        // Hinzufügen eines neuen Eintrags zur Tabelle und Senden an Backend
         addPartForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-    
+
             const newPart = {
                 licensePlate: document.getElementById('licensePlate').value,
                 partNumber: document.getElementById('partNumber').value.toString(),
@@ -143,7 +144,7 @@
                 remarks: document.getElementById('remarks').value,
                 creditAvailable: document.getElementById('creditAvailable').value,
             };
-    
+
             // Hinzufügen zur Tabelle
             const newRow = document.createElement('tr');
             for (const key in newPart) {
@@ -157,11 +158,11 @@
                 newRow.appendChild(cell);
             }
             partsTableBody.appendChild(newRow);
-    
+
             if (partsTableBody.children.length > 0) {
                 exportButton.classList.remove('hidden');
             }
-    
+
             // Senden der Daten an das Backend
             try {
                 const response = await fetch(backendUrl, {
@@ -169,11 +170,11 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newPart),
                 });
-    
+
                 if (!response.ok) {
                     throw new Error(`Fehler: ${response.status} ${response.statusText}`);
                 }
-    
+
                 const result = await response.json();
                 console.log('Erfolgreich an Backend gesendet:', result);
                 alert('Daten erfolgreich an das Backend gesendet!');
@@ -181,12 +182,11 @@
                 console.error('Fehler beim Senden der Daten:', error);
                 alert('Fehler beim Senden der Daten. Bitte versuche es erneut.');
             }
-    
+
             addPartForm.reset();
         });
-    
-        // Exportieren der Tabelle in eine Excel-Datei oder CSV-Datei für Safari
 
+        // Exportieren der Tabelle in eine Excel-Datei oder CSV-Datei für Safari
         exportButton.addEventListener('click', () => {
             const table = document.getElementById('partsTable');
             const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
