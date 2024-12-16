@@ -125,102 +125,81 @@
         const partsTableBody = document.querySelector('#partsTable tbody');
         const exportButton = document.getElementById('exportButton');
     
-        // Hinzufügen eines neuen Eintrags zur Tabelle
-        addPartForm.addEventListener('submit', (event) => {
+        // Backend-URL
+        const backendUrl = 'http://localhost:80'; // Ersetze durch deine tatsächliche URL
+    
+        // Hinzufügen eines neuen Eintrags zur Tabelle und Senden an Backend
+        addPartForm.addEventListener('submit', async (event) => {
             event.preventDefault();
     
             const newPart = {
                 licensePlate: document.getElementById('licensePlate').value,
-                partNumber: document.getElementById('partNumber').value.toString(), // Ensure partNumber is treated as a string
+                partNumber: document.getElementById('partNumber').value.toString(),
                 description: document.getElementById('description').value,
-                complaintDate: document.getElementById('complaintDate').value, // Date in YYYY-MM-DD format
+                complaintDate: document.getElementById('complaintDate').value,
                 reason: document.getElementById('reason').value,
                 price: document.getElementById('price').value,
                 remarks: document.getElementById('remarks').value,
                 creditAvailable: document.getElementById('creditAvailable').value,
             };
     
+            // Hinzufügen zur Tabelle
             const newRow = document.createElement('tr');
-    
             for (const key in newPart) {
                 const cell = document.createElement('td');
-                // Format date for display in the table
                 if (key === 'complaintDate' && newPart[key]) {
                     const date = new Date(newPart[key]);
-                    cell.textContent = date.toLocaleDateString('de-DE'); // Display as DD.MM.YYYY
+                    cell.textContent = date.toLocaleDateString('de-DE');
                 } else {
                     cell.textContent = newPart[key];
                 }
                 newRow.appendChild(cell);
             }
-    
             partsTableBody.appendChild(newRow);
     
-            // Show the export button if there is at least one entry
             if (partsTableBody.children.length > 0) {
                 exportButton.classList.remove('hidden');
+            }
+    
+            // Senden der Daten an das Backend
+            try {
+                const response = await fetch(backendUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newPart),
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`Fehler: ${response.status} ${response.statusText}`);
+                }
+    
+                const result = await response.json();
+                console.log('Erfolgreich an Backend gesendet:', result);
+                alert('Daten erfolgreich an das Backend gesendet!');
+            } catch (error) {
+                console.error('Fehler beim Senden der Daten:', error);
+                alert('Fehler beim Senden der Daten. Bitte versuche es erneut.');
             }
     
             addPartForm.reset();
         });
     
-        // Exportieren der Tabelle in eine Excel-Datei
+        // Exportieren der Tabelle in eine Excel-Datei oder CSV-Datei für Safari
+
         exportButton.addEventListener('click', () => {
             const table = document.getElementById('partsTable');
-            const wb = XLSX.utils.table_to_book(table, { sheet: "Ersatzteile" });
-    
-            // Access the worksheet
-            const sheet = wb.Sheets["Ersatzteile"];
-            const range = XLSX.utils.decode_range(sheet['!ref']);
-    
-            for (let R = range.s.r; R <= range.e.r; ++R) {
-                for (let C = range.s.c; C <= range.e.c; ++C) {
-                    const cell_address = { c: C, r: R };
-                    const cell_ref = XLSX.utils.encode_cell(cell_address);
-    
-                    if (sheet[cell_ref]) {
-                        // Format "Reklamationsdatum" column (4th column, index 3)
-                        if (C === 3 && R > 0) {
-                            const cellValue = sheet[cell_ref].v;
-    
-                            // Validate and format the date value
-                            if (Date.parse(cellValue)) {
-                                const date = new Date(cellValue);
-                                const formattedDate = date.toLocaleDateString('de-DE'); // Convert to DD.MM.YYYY
-                                sheet[cell_ref].v = formattedDate; // Update cell value
-                            }
-                        }
-    
-                        sheet[cell_ref].t = 's'; // Treat all cells as strings
-                    }
-                }
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+            if (isSafari) {
+                const wb = XLSX.utils.table_to_book(table, { sheet: "Ersatzteile" });
+                const csv = XLSX.utils.sheet_to_csv(wb.Sheets["Ersatzteile"]);
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                saveAs(blob, 'ersatzteile.csv');
+            } else {            
+                const wb = XLSX.utils.table_to_book(table, { sheet: "Ersatzteile" });
+                XLSX.writeFile(wb, 'ersatzteile.xlsx');
             }
-    
-            // Write the file
-            XLSX.writeFile(wb, 'ersatzteile.xlsx');
-        });
-    
-        // Dynamische Inhalte hier: Beispiel für Filterbarkeit der Spalten
-        document.querySelectorAll('#partsTable thead th').forEach((header, index) => {
-            header.addEventListener('click', () => {
-                const rows = Array.from(partsTableBody.querySelectorAll('tr'));
-                const isAscending = header.dataset.order === 'asc';
-                header.dataset.order = isAscending ? 'desc' : 'asc';
-    
-                rows.sort((rowA, rowB) => {
-                    const cellA = rowA.children[index].textContent.trim().toLowerCase();
-                    const cellB = rowB.children[index].textContent.trim().toLowerCase();
-    
-                    return isAscending
-                        ? cellA.localeCompare(cellB)
-                        : cellB.localeCompare(cellA);
-                });
-    
-                rows.forEach(row => partsTableBody.appendChild(row));
-            });
         });
     </script>
-    
-
 </body>
 </html>
