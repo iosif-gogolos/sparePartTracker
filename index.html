@@ -145,6 +145,23 @@
             background-color: #c9302c;
         }
 
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #pageInfo {
+            margin-right: 1rem;
+        }
+
     </style>
 </head>
 <body>
@@ -203,7 +220,7 @@
             <button type="submit">Hinzufügen</button>
         </form>      
 
-        <div>
+        <div class="pagination-container">
             <label for="entriesPerPage">Einträge pro Seite</label>
             <select id ="entriesPerPage">
                 <option value="10">10</option>
@@ -211,6 +228,12 @@
                 <option value="50">50</option>
                 <option value="100">100</option>
             </select>
+        </div>
+
+        <div class="pagination-controls">
+            <span id="pageInfo">Seite 1 von 1</span>
+            <button id="prevPageButton">Vorherige Seite</button>
+            <button id="nextPageButton">Nächste Seite</button>
         </div>
 
         <table id="partsTable">
@@ -234,10 +257,7 @@
 
         <x-divider height="200px" />
 
-        <div>
-            <button id="prevPageButton">Vorherige Seite</button>
-            <button id="nextPageButton">Nächste Seite</button>
-        </div>
+        
 
         <x-divider height="2px" />
 
@@ -251,7 +271,6 @@
 
         <x-divider height="2px" />
 
-        
 
         <div id="importSection" class="import-section">
             <h2>Datei importieren</h2>
@@ -268,7 +287,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script>
-        const addPartForm = document.getElementById('addPartForm');
+            const addPartForm = document.getElementById('addPartForm');
         const partsTableBody = document.querySelector('#partsTable tbody');
         const exportButton = document.getElementById('exportButton');
         const addButton = addPartForm.querySelector('button[type="submit"]');
@@ -400,8 +419,10 @@
         }
 
         function updatePaginationButtons() {
+            const totalPages = Math.ceil(storedParts.length / entriesPerPage);
+            document.getElementById('pageInfo').textContent = `Seite ${currentPage} von ${totalPages}`;
             prevPageButton.disabled = currentPage === 1;
-            nextPageButton.disabled = currentPage * entriesPerPage >= storedParts.length;
+            nextPageButton.disabled = currentPage >= totalPages;
         }
 
         entriesPerPageSelect.addEventListener('change', () => {
@@ -537,7 +558,7 @@
             loadPartsFromStorage();
             updateDashboard();
             updateClearButtonVisibility();
-        };
+        };     
     </script>
 </body>
 </html>
