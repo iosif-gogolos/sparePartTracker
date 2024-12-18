@@ -175,7 +175,28 @@
                 <option value="Nein" selected>Nein</option>
             </select>
             <button type="submit">Hinzufügen</button>
-        </form>        
+        </form>      
+        
+        
+
+        <div id="importSection" class="import-section">
+            <h2>Datei importieren</h2>
+            <form id="importForm" class="form-container">
+                <label for="importFile">Datei importieren (CSV oder XLSX)</label>
+                <input type="file" id="importFile" accept=".csv, .xlsx">
+                <button type="button" id="importButton">Importieren</button>
+            </form>
+        </div>
+
+        <div>
+            <label for="entriesPerPage">Einträge pro Seite</label>
+            <select id ="entriesPerPage">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
 
         <table id="partsTable">
             <thead>
@@ -195,24 +216,28 @@
                 <!-- Dynamische Inhalte werden hier hinzugefügt -->
             </tbody>
         </table>
+
+        <x-divider height="200px" />
+
+        <div>
+            <button id="prevPageButton">Vorherige Seite</button>
+            <button id="nextPageButton">Nächste Seite</button>
+        </div>
+
+        <x-divider height="2px" />
+
+
         <button id="exportButton" class="hidden">Liste Exportieren</button>
         <br/>
         
         
         <button id="clearTableButton" class="clear-button">Tabelle leeren</button>
-    </div>
 
-    <div id="importSection" class="import-section">
-            <h2>Datei importieren</h2>
-            <form id="importForm" class="form-container">
-                <label for="importFile">Datei importieren (CSV oder XLSX)</label>
-                <input type="file" id="importFile" accept=".csv, .xlsx">
-                <button type="button" id="importButton">Importieren</button>
-            </form>
-        </div>
+
+        <x-divider height="2px" />
 
     <div id="dashboard" class="hidden">
-        <h2>Metriken und Handlungsempfehlungen</h2>
+        <h2>Dashboard</h2>
         <div class="stats-grid">
             <div class="stat">
                 <h3>Anzahl nicht retournierter Teile</h3>
@@ -236,6 +261,8 @@
             <p id="recommendationText">Keine Empfehlungen verfügbar.</p>
         </div>
     </div>
+    </div>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -245,15 +272,31 @@
         const exportButton = document.getElementById('exportButton');
         const addButton = addPartForm.querySelector('button[type="submit"]');
         const clearTableButton = document.getElementById('clearTableButton');
+        const entriesPerPageSelect = document.getElementById('entriesPerPage');
+        const prevPageButton = document.getElementById('prevPageButton');
+        const nextPageButton = document.getElementById('nextPageButton');
         let uniqueId = 0;
         let isEditing = false;
         let editingId = null;
+        let currentPage = 1;
+        let entriesPerPage = parseInt(entriesPerPageSelect.value, 10);
+        let storedParts = [];
 
         function loadPartsFromStorage() {
-            const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
-            storedParts.forEach(addPartToTable);
+            storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
+            renderTable();
             if (storedParts.length > 0) exportButton.classList.remove('hidden');
             updateClearButtonVisibility();
+        }
+
+        function renderTable() {
+            partsTableBody.innerHTML = '';
+            const start = (currentPage - 1) * entriesPerPage;
+            const end = start + entriesPerPage;
+            const partsToDisplay = storedParts.slice(start, end);
+
+            partsToDisplay.forEach(addPartToTable);
+            updatePaginationButtons();
         }
 
         function addPartToTable(part) {
@@ -285,16 +328,15 @@
             actionsCell.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
             newRow.appendChild(actionsCell);
             partsTableBody.appendChild(newRow);
-            updateClearButtonVisibility();
         }
 
         function removePartFromTable(id) {
-            const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
-            const updatedParts = storedParts.filter(part => part.id !== id);
-            localStorage.setItem('partsData', JSON.stringify(updatedParts));
-            document.querySelector(`tr[data-id="${id}"]`)?.remove();
+            storedParts = storedParts.filter(part => part.id !== id);
+            localStorage.setItem('partsData', JSON.stringify(storedParts));
+            renderTable();
             if (!partsTableBody.children.length) exportButton.classList.add('hidden');
             updateClearButtonVisibility();
+            updateDashboard(); // Aktualisiere die Metriken und Handlungsempfehlungen
         }
 
         function loadPartToForm(part) {
@@ -312,22 +354,23 @@
         }
 
         function savePartToStorage(part) {
-            const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
             storedParts.push(part);
             localStorage.setItem('partsData', JSON.stringify(storedParts));
+            renderTable();
             updateClearButtonVisibility();
+            updateDashboard(); // Aktualisiere die Metriken und Handlungsempfehlungen
         }
 
         function updatePartInStorage(updatedPart) {
-            const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
             const partIndex = storedParts.findIndex(part => part.id === updatedPart.id);
             if (partIndex !== -1) storedParts[partIndex] = updatedPart;
             localStorage.setItem('partsData', JSON.stringify(storedParts));
+            renderTable();
             updateClearButtonVisibility();
+            updateDashboard(); // Aktualisiere die Metriken und Handlungsempfehlungen
         }
 
         function updateClearButtonVisibility() {
-            const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
             if (storedParts.length > 0) {
                 clearTableButton.classList.remove('hidden');
             } else {
@@ -336,7 +379,6 @@
         }
 
         function updateDashboard() {
-            const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
             const notReturnedCount = storedParts.length;
             const totalPrice = storedParts.reduce((sum, part) => sum + parseFloat(part.price || 0), 0);
             const creditPrice = storedParts.filter(part => part.creditAvailable === 'Ja').reduce((sum, part) => sum + parseFloat(part.price || 0), 0);
@@ -355,6 +397,31 @@
             }
             document.getElementById('dashboard').classList.remove('hidden');
         }
+
+        function updatePaginationButtons() {
+            prevPageButton.disabled = currentPage === 1;
+            nextPageButton.disabled = currentPage * entriesPerPage >= storedParts.length;
+        }
+
+        entriesPerPageSelect.addEventListener('change', () => {
+            entriesPerPage = parseInt(entriesPerPageSelect.value, 10);
+            currentPage = 1;
+            renderTable();
+        });
+
+        prevPageButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        });
+
+        nextPageButton.addEventListener('click', () => {
+            if (currentPage * entriesPerPage < storedParts.length) {
+                currentPage++;
+                renderTable();
+            }
+        });
 
         addPartForm.addEventListener('submit', event => {
             event.preventDefault();
@@ -390,7 +457,6 @@
         });
 
         exportButton.addEventListener('click', () => {
-            const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
             const worksheet = XLSX.utils.json_to_sheet(storedParts);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Teile');
@@ -401,10 +467,11 @@
         clearTableButton.addEventListener('click', () => {
             if (confirm("Sind Sie sicher, dass Sie alle Einträge löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.")) {
                 localStorage.removeItem('partsData');
-                partsTableBody.innerHTML = '';
+                storedParts = [];
+                renderTable();
                 exportButton.classList.add('hidden');
                 clearTableButton.classList.add('hidden');
-                updateDashboard();
+                updateDashboard(); // Aktualisiere die Metriken und Handlungsempfehlungen
                 alert("Alle Einträge wurden gelöscht.");
             }
         });
@@ -427,27 +494,27 @@
                 const sheetName = workbook.SheetNames[0];
                 const sheet = workbook.Sheets[sheetName];
 
-                const importedData = XLSX.utils.sheet_to_json(sheet);
+                const importedData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-                const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
-                importedData.forEach((item, index) => {
+                const headers = importedData[0];
+                importedData.slice(1).forEach((row, index) => {
                     const newPart = {
                         id: uniqueId++,
-                        licensePlate: item.licensePlate || `Unbekannt ${index}`,
-                        partNumber: item.partNumber || "",
-                        description: item.description || "",
-                        complaintDate: item.complaintDate || "",
-                        reason: item.reason || "",
-                        price: item.price || "0",
-                        remarks: item.remarks || "",
-                        creditAvailable: item.creditAvailable || "Nein",
+                        licensePlate: row[headers.indexOf('licensePlate')] || `Unbekannt ${index}`,
+                        partNumber: row[headers.indexOf('partNumber')] || "",
+                        description: row[headers.indexOf('description')] || "",
+                        complaintDate: row[headers.indexOf('complaintDate')] || "",
+                        reason: row[headers.indexOf('reason')] || "",
+                        price: row[headers.indexOf('price')] || "0",
+                        remarks: row[headers.indexOf('remarks')] || "",
+                        creditAvailable: row[headers.indexOf('creditAvailable')] || "Nein",
                     };
 
                     storedParts.push(newPart);
-                    addPartToTable(newPart);
                 });
 
                 localStorage.setItem('partsData', JSON.stringify(storedParts));
+                renderTable();
                 updateDashboard();
                 exportButton.classList.remove('hidden');
                 updateClearButtonVisibility();
