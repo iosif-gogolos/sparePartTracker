@@ -150,6 +150,32 @@
 <body>
     <div class="container">
         <h1>Ersatzteil-Tracker Markgröningen</h1>
+
+        <div id="dashboard" class="hidden">
+            <h2>Dashboard</h2>
+            <div class="stats-grid">
+                <div class="stat">
+                    <h3>Anzahl nicht retournierter Teile</h3>
+                    <p id="notReturnedCount">0</p>
+                </div>
+                <div class="stat">
+                    <h3>Summe Preis (alle Ersatzteile)</h3>
+                    <p id="totalPrice">0 €</p>
+                </div>
+                <div class="stat">
+                    <h3>Davon Gutschrift vorhanden</h3>
+                    <p id="creditPrice">0 €</p>
+                </div>
+                <div class="stat">
+                    <h3>Offener Betrag</h3>
+                    <p id="openAmount">0 €</p>
+                </div>
+            </div>
+            <div id="recommendation" class="recommendation-box">
+                <h3>Handlungsempfehlung</h3>
+                <p id="recommendationText">Keine Empfehlungen verfügbar.</p>
+            </div>
+        </div>
         
         <form id="addPartForm" class="form-container">
             <label for="licensePlate">Kennzeichen</label>
@@ -176,17 +202,6 @@
             </select>
             <button type="submit">Hinzufügen</button>
         </form>      
-        
-        
-
-        <div id="importSection" class="import-section">
-            <h2>Datei importieren</h2>
-            <form id="importForm" class="form-container">
-                <label for="importFile">Datei importieren (CSV oder XLSX)</label>
-                <input type="file" id="importFile" accept=".csv, .xlsx">
-                <button type="button" id="importButton">Importieren</button>
-            </form>
-        </div>
 
         <div>
             <label for="entriesPerPage">Einträge pro Seite</label>
@@ -236,31 +251,17 @@
 
         <x-divider height="2px" />
 
-    <div id="dashboard" class="hidden">
-        <h2>Dashboard</h2>
-        <div class="stats-grid">
-            <div class="stat">
-                <h3>Anzahl nicht retournierter Teile</h3>
-                <p id="notReturnedCount">0</p>
-            </div>
-            <div class="stat">
-                <h3>Summe Preis (alle Ersatzteile)</h3>
-                <p id="totalPrice">0 €</p>
-            </div>
-            <div class="stat">
-                <h3>Davon Gutschrift vorhanden</h3>
-                <p id="creditPrice">0 €</p>
-            </div>
-            <div class="stat">
-                <h3>Offener Betrag</h3>
-                <p id="openAmount">0 €</p>
-            </div>
+        
+
+        <div id="importSection" class="import-section">
+            <h2>Datei importieren</h2>
+            <form id="importForm" class="form-container">
+                <label for="importFile">Datei importieren (CSV oder XLSX)</label>
+                <input type="file" id="importFile" accept=".csv, .xlsx">
+                <button type="button" id="importButton">Importieren</button>
+            </form>
         </div>
-        <div id="recommendation" class="recommendation-box">
-            <h3>Handlungsempfehlung</h3>
-            <p id="recommendationText">Keine Empfehlungen verfügbar.</p>
-        </div>
-    </div>
+
     </div>
 
 
