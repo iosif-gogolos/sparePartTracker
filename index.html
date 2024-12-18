@@ -6,7 +6,7 @@
     <title>Ersatzteil-Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.1.0/modern-normalize.min.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -65,7 +65,6 @@
             gap: 1rem;
             margin: 1rem 0;
         }
-
         .stat {
             background-color: #f9f9f9;
             border: 1px solid #ddd;
@@ -73,17 +72,77 @@
             text-align: center;
             border-radius: 8px;
         }
-
         .stat h3 {
             margin-bottom: 0.5rem;
         }
-
         .recommendation-box {
             margin: 1rem 0;
             padding: 1rem;
             background-color: #e6f7ff;
             border-left: 4px solid #0056b3;
             border-radius: 8px;
+        }
+
+        .import-section {
+            background-color: #f9f9f9;
+            border: 2px solid #ddd;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .import-section h2 {
+            margin-bottom: 1rem;
+            color: #003e70;
+            text-align: center;
+        }
+
+        #importForm {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        #importForm label {
+            font-weight: bold;
+        }
+
+        #importForm input {
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #importForm button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        #importForm button:hover {
+            background-color: #003e70;
+        }
+        
+        .clear-button {
+            margin-top: 1rem;
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .clear-button:hover {
+            background-color: #c9302c;
         }
 
     </style>
@@ -95,36 +154,28 @@
         <form id="addPartForm" class="form-container">
             <label for="licensePlate">Kennzeichen</label>
             <input type="text" id="licensePlate" placeholder="Kennzeichen" required>
-
             <label for="partNumber">Teilenummer</label>
             <input type="text" id="partNumber" placeholder="Teilenummer" required>
-
             <label for="description">Beschreibung</label>
             <input type="text" id="description" placeholder="Beschreibung">
-
             <label for="complaintDate">Reklamationsdatum</label>
             <input type="date" id="complaintDate" required>
-
             <label for="reason">Grund</label>
             <select id="reason">
                 <option value="Beschädigt">Beschädigt</option>
                 <option value="Falsch geliefert">Falsch geliefert</option>
             </select>
-
             <label for="price">Preis</label>
             <input type="text" id="price" placeholder="Preis">
-
             <label for="remarks">Bemerkung</label>
             <input type="text" id="remarks" placeholder="Bemerkung">
-
             <label for="creditAvailable">Gutschrift vorhanden</label>
             <select id="creditAvailable">
                 <option value="Ja">Ja</option>
                 <option value="Nein" selected>Nein</option>
             </select>
-
             <button type="submit">Hinzufügen</button>
-        </form>
+        </form>        
 
         <table id="partsTable">
             <thead>
@@ -137,16 +188,29 @@
                     <th>Preis</th>
                     <th>Bemerkung</th>
                     <th>Gutschrift vorhanden</th>
+                    <th>Aktionen</th>
                 </tr>
             </thead>
             <tbody>
                 <!-- Dynamische Inhalte werden hier hinzugefügt -->
             </tbody>
         </table>
-
         <button id="exportButton" class="hidden">Liste Exportieren</button>
-
+        <br/>
+        
+        
+        <button id="clearTableButton" class="clear-button">Tabelle leeren</button>
     </div>
+
+    <div id="importSection" class="import-section">
+            <h2>Datei importieren</h2>
+            <form id="importForm" class="form-container">
+                <label for="importFile">Datei importieren (CSV oder XLSX)</label>
+                <input type="file" id="importFile" accept=".csv, .xlsx">
+                <button type="button" id="importButton">Importieren</button>
+            </form>
+        </div>
+
     <div id="dashboard" class="hidden">
         <h2>Metriken und Handlungsempfehlungen</h2>
         <div class="stats-grid">
@@ -172,56 +236,133 @@
             <p id="recommendationText">Keine Empfehlungen verfügbar.</p>
         </div>
     </div>
-    
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
     <script>
         const addPartForm = document.getElementById('addPartForm');
         const partsTableBody = document.querySelector('#partsTable tbody');
         const exportButton = document.getElementById('exportButton');
+        const addButton = addPartForm.querySelector('button[type="submit"]');
+        const clearTableButton = document.getElementById('clearTableButton');
+        let uniqueId = 0;
+        let isEditing = false;
+        let editingId = null;
 
-        // Daten aus localStorage laden
         function loadPartsFromStorage() {
             const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
             storedParts.forEach(addPartToTable);
-
-            if (storedParts.length > 0) {
-                exportButton.classList.remove('hidden');
-            }
+            if (storedParts.length > 0) exportButton.classList.remove('hidden');
+            updateClearButtonVisibility();
         }
 
-        // Einen neuen Teil zur Tabelle hinzufügen
         function addPartToTable(part) {
             const newRow = document.createElement('tr');
+            newRow.setAttribute('data-id', part.id);
+
             for (const key in part) {
+                if (key === 'id') continue;
                 const cell = document.createElement('td');
-                if (key === 'complaintDate' && part[key]) {
-                    const date = new Date(part[key]);
-                    cell.textContent = date.toLocaleDateString('de-DE');
-                } else {
-                    cell.textContent = part[key];
-                }
+                cell.textContent = key === 'complaintDate' && part[key]
+                    ? new Date(part[key]).toLocaleDateString('de-DE')
+                    : part[key];
                 newRow.appendChild(cell);
             }
+
+            const actionsCell = document.createElement('td');
+            actionsCell.innerHTML = `
+                <button class="icon-button delete-btn" title="Löschen">
+                    <span class="material-icons">delete</span>
+                </button>
+                <button class="icon-button edit-btn" title="Bearbeiten">
+                    <span class="material-icons">edit</span>
+                </button>
+            `;
+            actionsCell.querySelector('.delete-btn').addEventListener('click', () => {
+                if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`))
+                    removePartFromTable(part.id);
+            });
+            actionsCell.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
+            newRow.appendChild(actionsCell);
             partsTableBody.appendChild(newRow);
+            updateClearButtonVisibility();
         }
 
-        // Daten speichern
+        function removePartFromTable(id) {
+            const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
+            const updatedParts = storedParts.filter(part => part.id !== id);
+            localStorage.setItem('partsData', JSON.stringify(updatedParts));
+            document.querySelector(`tr[data-id="${id}"]`)?.remove();
+            if (!partsTableBody.children.length) exportButton.classList.add('hidden');
+            updateClearButtonVisibility();
+        }
+
+        function loadPartToForm(part) {
+            document.getElementById('licensePlate').value = part.licensePlate;
+            document.getElementById('partNumber').value = part.partNumber;
+            document.getElementById('description').value = part.description;
+            document.getElementById('complaintDate').value = part.complaintDate;
+            document.getElementById('reason').value = part.reason;
+            document.getElementById('price').value = part.price;
+            document.getElementById('remarks').value = part.remarks;
+            document.getElementById('creditAvailable').value = part.creditAvailable;
+            addButton.textContent = 'Speichern';
+            isEditing = true;
+            editingId = part.id;
+        }
+
         function savePartToStorage(part) {
             const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
             storedParts.push(part);
             localStorage.setItem('partsData', JSON.stringify(storedParts));
+            updateClearButtonVisibility();
         }
 
-        // Event-Listener für das Hinzufügen eines neuen Eintrags
-        addPartForm.addEventListener('submit', (event) => {
+        function updatePartInStorage(updatedPart) {
+            const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
+            const partIndex = storedParts.findIndex(part => part.id === updatedPart.id);
+            if (partIndex !== -1) storedParts[partIndex] = updatedPart;
+            localStorage.setItem('partsData', JSON.stringify(storedParts));
+            updateClearButtonVisibility();
+        }
+
+        function updateClearButtonVisibility() {
+            const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
+            if (storedParts.length > 0) {
+                clearTableButton.classList.remove('hidden');
+            } else {
+                clearTableButton.classList.add('hidden');
+            }
+        }
+
+        function updateDashboard() {
+            const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
+            const notReturnedCount = storedParts.length;
+            const totalPrice = storedParts.reduce((sum, part) => sum + parseFloat(part.price || 0), 0);
+            const creditPrice = storedParts.filter(part => part.creditAvailable === 'Ja').reduce((sum, part) => sum + parseFloat(part.price || 0), 0);
+            const openAmount = totalPrice - creditPrice;
+
+            document.getElementById('notReturnedCount').textContent = notReturnedCount;
+            document.getElementById('totalPrice').textContent = `${totalPrice.toFixed(2)} €`;
+            document.getElementById('creditPrice').textContent = `${creditPrice.toFixed(2)} €`;
+            document.getElementById('openAmount').textContent = `${openAmount.toFixed(2)} €`;
+
+            const recommendationText = document.getElementById('recommendationText');
+            if (openAmount > 1000) {
+                recommendationText.textContent = "Bitte offene Beträge reduzieren.";
+            } else {
+                recommendationText.textContent = "Keine Empfehlungen verfügbar.";
+            }
+            document.getElementById('dashboard').classList.remove('hidden');
+        }
+
+        addPartForm.addEventListener('submit', event => {
             event.preventDefault();
 
             const newPart = {
+                id: isEditing ? editingId : uniqueId++,
                 licensePlate: document.getElementById('licensePlate').value,
-                partNumber: document.getElementById('partNumber').value.toString(),
+                partNumber: document.getElementById('partNumber').value,
                 description: document.getElementById('description').value,
                 complaintDate: document.getElementById('complaintDate').value,
                 reason: document.getElementById('reason').value,
@@ -230,80 +371,104 @@
                 creditAvailable: document.getElementById('creditAvailable').value,
             };
 
-            addPartToTable(newPart);
-            savePartToStorage(newPart);
-
-            if (partsTableBody.children.length > 0) {
-                exportButton.classList.remove('hidden');
+            if (isEditing) {
+                updatePartInStorage(newPart);
+                document.querySelector(`tr[data-id="${editingId}"]`)?.remove();
+                addPartToTable(newPart);
+                isEditing = false;
+                editingId = null;
+                addButton.textContent = 'Hinzufügen';
+            } else {
+                addPartToTable(newPart);
+                savePartToStorage(newPart);
             }
 
+            exportButton.classList.remove('hidden');
             addPartForm.reset();
-        });
-
-        // Tabelle exportieren
-        exportButton.addEventListener('click', () => {
-            const table = document.getElementById('partsTable');
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-            const wb = XLSX.utils.table_to_book(table, { sheet: "Ersatzteile" });
-            if (isSafari) {
-                const csv = XLSX.utils.sheet_to_csv(wb.Sheets["Ersatzteile"]);
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                saveAs(blob, 'ersatzteile.csv');
-            } else {
-                XLSX.writeFile(wb, 'ersatzteile.xlsx');
-            }
-        });
-
-        // Initialisieren
-        loadPartsFromStorage();
-
-        // Dashboard-Elemente
-        const dashboard = document.getElementById('dashboard');
-        const notReturnedCountElement = document.getElementById('notReturnedCount');
-        const totalPriceElement = document.getElementById('totalPrice');
-        const creditPriceElement = document.getElementById('creditPrice');
-        const openAmountElement = document.getElementById('openAmount');
-        const recommendationTextElement = document.getElementById('recommendationText');
-
-        // Dashboard aktualisieren
-        function updateDashboard() {
-            const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
-            
-            const totalParts = storedParts.length;
-            const totalPrice = storedParts.reduce((sum, part) => sum + parseFloat(part.price || 0), 0);
-            const creditPrice = storedParts
-                .filter(part => part.creditAvailable === 'Ja')
-                .reduce((sum, part) => sum + parseFloat(part.price || 0), 0);
-            const openAmount = totalPrice - creditPrice;
-            const notReturnedCount = totalParts; // Angenommen, alle Teile sind noch nicht retourniert
-            
-            // Metriken setzen
-            notReturnedCountElement.textContent = notReturnedCount;
-            totalPriceElement.textContent = totalPrice.toFixed(2) + ' €';
-            creditPriceElement.textContent = creditPrice.toFixed(2) + ' €';
-            openAmountElement.textContent = openAmount.toFixed(2) + ' €';
-            
-            // Handlungsempfehlungen
-            if (notReturnedCount > 0) {
-                recommendationTextElement.textContent = `Es gibt ${notReturnedCount} nicht retournierte Teile. Bitte setzen Sie sich mit Riparo in Verbindung.`;
-            } else {
-                recommendationTextElement.textContent = 'Alle Teile sind retourniert. Es gibt keine offenen Aufgaben.';
-            }
-
-            // Dashboard anzeigen
-            dashboard.classList.remove('hidden');
-        }
-
-        // Nach jedem neuen Eintrag Dashboard aktualisieren
-        addPartForm.addEventListener('submit', () => {
             updateDashboard();
+            updateClearButtonVisibility();
         });
 
-        // Beim Laden der Seite Dashboard initialisieren
-        loadPartsFromStorage();
-        updateDashboard();
+        exportButton.addEventListener('click', () => {
+            const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
+            const worksheet = XLSX.utils.json_to_sheet(storedParts);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Teile');
+            const exportFileName = `Teile_${new Date().toLocaleDateString('de-DE')}.xlsx`;
+            XLSX.writeFile(workbook, exportFileName);
+        });
 
+        clearTableButton.addEventListener('click', () => {
+            if (confirm("Sind Sie sicher, dass Sie alle Einträge löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.")) {
+                localStorage.removeItem('partsData');
+                partsTableBody.innerHTML = '';
+                exportButton.classList.add('hidden');
+                clearTableButton.classList.add('hidden');
+                alert("Alle Einträge wurden gelöscht.");
+            }
+        });
+
+        document.getElementById('importButton').addEventListener('click', () => {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Bitte wählen Sie eine Datei aus.");
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = (event) => {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+
+                const sheetName = workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+
+                const importedData = XLSX.utils.sheet_to_json(sheet);
+
+                const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
+                importedData.forEach((item, index) => {
+                    const newPart = {
+                        id: uniqueId++,
+                        licensePlate: item.licensePlate || `Unbekannt ${index}`,
+                        partNumber: item.partNumber || "",
+                        description: item.description || "",
+                        complaintDate: item.complaintDate || "",
+                        reason: item.reason || "",
+                        price: item.price || "0",
+                        remarks: item.remarks || "",
+                        creditAvailable: item.creditAvailable || "Nein",
+                    };
+
+                    storedParts.push(newPart);
+                    addPartToTable(newPart);
+                });
+
+                localStorage.setItem('partsData', JSON.stringify(storedParts));
+                updateDashboard();
+                exportButton.classList.remove('hidden');
+                updateClearButtonVisibility();
+                alert("Import erfolgreich abgeschlossen!");
+            };
+
+            reader.onerror = (error) => {
+                alert("Fehler beim Lesen der Datei: " + error.message);
+            };
+
+            if (file.name.endsWith('.csv')) {
+                reader.readAsText(file);
+            } else {
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
+        window.onload = () => {
+            loadPartsFromStorage();
+            updateDashboard();
+            updateClearButtonVisibility();
+        };
     </script>
 </body>
 </html>
