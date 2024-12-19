@@ -539,16 +539,16 @@
 
             function addPartToTable(part) {
                 const newRow = document.createElement('tr');
-                //newRow.setAttribute('data-id', part.id);
-                newRow.dataset.id = part.id;
+                newRow.setAttribute('data-id', part.id);
+                //actionsCell.appendChild(viewImagesButton);
                 const actionsCell = document.createElement('td');
-
                 if (part.images.length > 0) {
                     const viewImagesButton = document.createElement('button');
                     viewImagesButton.innerHTML = '<span class="material-icons">image</span>';
                     viewImagesButton.addEventListener('click', () => viewImages(part.images));
                     actionsCell.appendChild(viewImagesButton);
                 }
+                
                 
                 /*
                 for (const key in part) {
