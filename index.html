@@ -243,6 +243,7 @@
                 object-fit: cover;
                 border: 1px solid #ccc;
                 border-radius: 4px;
+                position: relative;
             }
             .image-preview .remove-button {
                 position: absolute;
@@ -292,8 +293,6 @@
                 <p id="recommendationText">Keine Empfehlungen verfügbar.</p>
             </div>
         </div>
-
-        
         
         <form id="addPartForm" class="form-container">
             <label for="licensePlate">Kennzeichen</label>
@@ -313,6 +312,8 @@
             <input type="text" id="price" placeholder="Preis">
             <label for="remarks">Bemerkung</label>
             <input type="text" id="remarks" placeholder="Bemerkung">
+
+            <!-- Gutschrift vorhanden -->
             <label for="creditAvailable">Gutschrift vorhanden</label>
             <select id="creditAvailable">
                 <option value="Ja">Ja</option>
@@ -376,22 +377,8 @@
             </tbody>
         </table>
 
-        <x-divider height="200px" />
-
-        
-
-        <x-divider height="2px" />
-
-
-        <button id="exportButton" class="hidden">Liste Exportieren</button>
-        <br/>
-        
-        
+        <button id="exportButton" class="hidden">Liste Exportieren</button>    
         <button id="clearTableButton" class="clear-button">Tabelle leeren</button>
-
-
-        <x-divider height="2px" />
-
 
         <div id="importSection" class="import-section">
             <h2>Datei importieren</h2>
@@ -404,9 +391,10 @@
 
     </div>
 
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+
     <script>
             const addPartForm = document.getElementById('addPartForm');
             const partsTableBody = document.querySelector('#partsTable tbody');
@@ -422,6 +410,8 @@
             const partImagesInput = document.getElementById('partImages');
             const uploadImagesButton = document.getElementById('uploadImagesButton');
             const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+            
+            let imageFiles = [];
             let uniqueId = 0;
             let isEditing = false;
             let editingId = null;
@@ -429,7 +419,6 @@
             let entriesPerPage = parseInt(entriesPerPageSelect.value, 10);
             let storedParts = [];
             let filteredParts = [];
-            let imageFiles = [];
 
             uploadImagesButton.addEventListener('click', () => {
                 partImagesInput.click();
@@ -530,7 +519,15 @@
                         removePartFromTable(part.id);
                 });
                 actionsCell.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
-                actionsCell.querySelector('.view-images-btn').addEventListener('click', () => viewImages(part.images));
+                actionsCell.querySelector('.view-images-btn').addEventListener('click', () => {
+                    if (part.images.length === 0) {
+                        if (confirm("Es wurden noch keine Bilder hinzugefügt. Möchten Sie jetzt Bilder hinzufügen?")) {
+                            partImagesInput.click();
+                        }
+                    } else {
+                        viewImages(part.images);
+                    }
+                });
                 newRow.appendChild(actionsCell);
                 partsTableBody.appendChild(newRow);
             }
@@ -705,6 +702,12 @@
                     images: []
                 };
 
+                const files = partImagesInput.files;
+                if (files.length > 5) {
+                    alert("Sie können maximal 5 Bilder hochladen.");
+                    return;
+                }
+
                 const readerPromises = [];
                 imageFiles.forEach((file, index) => {
                     const reader = new FileReader();
@@ -743,11 +746,30 @@
             });
 
             exportButton.addEventListener('click', () => {
+                const zip = new JSZip();
+                const folderName = `Retoure-Ersatzteil-${new Date().toLocaleDateString('de-DE')}`;
+                const mainFolder = zip.folder(folderName);
+                const imagesFolder = mainFolder.folder('Bilder');
+
+                // Export der Liste als CSV
                 const worksheet = XLSX.utils.json_to_sheet(storedParts);
                 const csv = XLSX.utils.sheet_to_csv(worksheet);
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const exportFileName = `Teile_${new Date().toLocaleDateString('de-DE')}.csv`;
-                saveAs(blob, exportFileName);
+                mainFolder.file('Liste.csv', csv);
+                
+                // Hinzufügen der Bilder
+                storedParts.forEach(part => {
+                    const partFolderName = `${part.licensePlate}-${part.partNumber}-${new Date(part.complaintDate).toLocaleDateString('de-DE')}`;
+                    const partFolder = imagesFolder.folder(partFolderName);
+                    part.images.forEach((image, index) => {
+                        const base64Data = image.split(',')[1];
+                        partFolder.file(`Bild-${index + 1}.jpg`, base64Data, { base64: true });
+                    })
+                })
+
+                // Generiere das ZIP-Archiv und speichere es
+                zip.generateAsync({ type: 'blob' }).then(content => {
+                    saveAs(content, `${folderName}.zip`);
+                });
             });
 
             clearTableButton.addEventListener('click', () => {
