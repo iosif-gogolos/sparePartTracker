@@ -539,20 +539,8 @@
 
             function addPartToTable(part) {
                 const newRow = document.createElement('tr');
-                newRow.dataset.id = part.id;
-                //.setAttribute('data-id', part.id);
-
-                //actionsCell.appendChild(viewImagesButton);
-                const actionsCell = document.createElement('td');
-                if (part.images.length > 0) {
-                    const viewImagesButton = document.createElement('button');
-                    viewImagesButton.innerHTML = '<span class="material-icons">image</span>';
-                    viewImagesButton.addEventListener('click', () => viewImages(part.images));
-                    actionsCell.appendChild(viewImagesButton);
-                }
+                newRow.setAttribute('data-id', part.id);
                 
-                
-                /*
                 for (const key in part) {
                     if (key === 'id' || key === 'images') continue;
                     const cell = document.createElement('td');
@@ -577,7 +565,8 @@
                 actionsCell.querySelector('.delete-btn').addEventListener('click', () => {
                     if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`))
                         removePartFromTable(part.id);
-                }); */
+                }); 
+
                 actionsCell.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
                 actionsCell.querySelector('.view-images-btn').addEventListener('click', () => {
                     if (part.images.length === 0) {
