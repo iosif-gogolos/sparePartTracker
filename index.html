@@ -297,6 +297,17 @@
                 cursor: pointer;
             }
 
+            .ocr-result {
+                margin-top: 0.5rem;
+                background-color: f4f4f4;
+                padding: 0.5rem;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                border-radius: 4px;
+                font-size: 0.9rem;
+                color: #333;
+            }
+
     </style>
 </head>
 <body>
@@ -435,6 +446,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <!-- Usage of Tesseract.js for OCR-->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
 
     <script>
             const addPartForm = document.getElementById('addPartForm');
@@ -482,7 +495,7 @@
                 }
                 imageFiles.forEach((file, index) => {
                     const reader = new FileReader();
-                    reader.onload = (e) => {
+                    reader.onload = async (e) => {
                         const img = document.createElement('div');
                         img.classList.add('image-preview');
                         img.innerHTML = `
@@ -490,6 +503,14 @@
                             <button class="remove-button" data-index="${index}">&times;</button>
                         `;
                         imagePreviewContainer.appendChild(img);
+
+                        // Perform OCR on the image
+                        const orcText = await performOCR(e.target.result);
+                        console.log(`OCR Result for image ${index + 1}:`, orcText);
+                        const orcResultDiv = document.createElement('div');
+                        ocrResultDiv.classList.add(`ocr-result`);
+                        ocrResultDiv.textContent(`OCR Result: ${orcText}`);
+                        img.appendChild(orcResultDiv)
                     };
                     reader.readAsDataURL(file);
                 });
@@ -503,7 +524,7 @@
                     imagePreviewContainer.innerHTML = '';
                     imageFiles.forEach((file, index) => {
                         const reader = new FileReader();
-                        reader.onload = (e) => {
+                        reader.onload = async (e) => {
                             const img = document.createElement('div');
                             img.classList.add('image-preview');
                             img.innerHTML = `
@@ -511,6 +532,14 @@
                                 <button class="remove-button" data-index="${index}">&times;</button>
                             `;
                             imagePreviewContainer.appendChild(img);
+
+                            // Perform OCR on the image
+                            const orcText = await performOCR(e.target.result);
+                            console.log(`OCR Result for image ${index + 1}:`, orcText);
+                            const orcResultDiv = document.createElement('div');
+                            ocrResultDiv.classlist.add('ocr-result');
+                            ocrResultDiv.textContent(`OCR Result: ${orcText}`);
+                            img.appendChild(orcResultDiv);
                         };
                         reader.readAsDataURL(file);
                     });
@@ -613,6 +642,18 @@
                     document.body.removeChild(imageModal);
                 });
             } */
+
+            // OCR Erkennung
+            async function performOCR(imageSrc) {
+                const {data: {text}} = await Tesseract.recognize(
+                    imageSrc,
+                    'eng',
+                    {
+                        logger: m => console.log(m)
+                    }
+                );
+                return text;
+            }
 
             function removePartFromTable(id) {
                 storedParts = storedParts.filter(part => part.id !== id);
