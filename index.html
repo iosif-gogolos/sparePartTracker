@@ -269,6 +269,34 @@
                 justify-content: center;
             }
 
+            .image-preview-overlay {
+                position: fixed;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                display: none;
+            }
+
+            .image-preview-overlay img {
+                max-width: 90%;
+                max-height: 90%;
+            }
+
+            .image-preview-overlay .close-button {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: white;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
     </style>
 </head>
 <body>
@@ -365,6 +393,12 @@
             </button>
         </div>
 
+        <div class="image-preview-overlay" id="imagePreviewOverlay">
+            <button class="close-button" id="closePreviewButton">&times;</button>
+            <img id="previewImage" src="" alt="Preview image">
+
+        </div>
+
         <table id="partsTable">
             <thead>
                 <tr>
@@ -417,6 +451,9 @@
             const partImagesInput = document.getElementById('partImages');
             const uploadImagesButton = document.getElementById('uploadImagesButton');
             const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+            const imagePreviewOverlay = document.getElementById('imagePreviewOverlay');
+            const previewImage = document.getElementById('previewImage');
+            const closePreviewButton = document.getElementById('closePreviewButton');
             let imageFiles = [];
             let uniqueId = 0;
             let isEditing = false;
@@ -428,6 +465,10 @@
 
             uploadImagesButton.addEventListener('click', () => {
                 partImagesInput.click();
+            });
+
+            closePreviewButton.addEventListener('click', () => {
+                imagePreviewOverlay.style.display = 'none';
             });
 
             partImagesInput.addEventListener('change', () => {
@@ -500,6 +541,14 @@
                 const newRow = document.createElement('tr');
                 newRow.setAttribute('data-id', part.id);
 
+                if (part.images.length > 0) {
+                    const viewImagesButton = document.createElement('button');
+                    viewImagesButton.innerHTML = '<span class="material-icons">image</span>';
+                    viewImagesButton.addEventListener('click', () => viewImages(part.images));
+                    actionsCell.appendChild(viewImagesButton);
+                }
+                
+                /*
                 for (const key in part) {
                     if (key === 'id' || key === 'images') continue;
                     const cell = document.createElement('td');
@@ -524,7 +573,7 @@
                 actionsCell.querySelector('.delete-btn').addEventListener('click', () => {
                     if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`))
                         removePartFromTable(part.id);
-                });
+                }); */
                 actionsCell.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
                 actionsCell.querySelector('.view-images-btn').addEventListener('click', () => {
                     if (part.images.length === 0) {
@@ -539,6 +588,14 @@
                 partsTableBody.appendChild(newRow);
             }
 
+            function viewImages(images) {
+                if (images.length > 0) {
+                    previewImage.src = images[0];
+                    imagePreviewOverlay.style.display = 'flex';
+                }
+            }
+            
+            /*
             function viewImages(images) {
                 const imageModal = document.createElement('div');
                 imageModal.classList.add('image-modal');
@@ -562,7 +619,7 @@
                 closeButton.addEventListener('click', () => {
                     document.body.removeChild(imageModal);
                 });
-            }
+            } */
 
             function removePartFromTable(id) {
                 storedParts = storedParts.filter(part => part.id !== id);
@@ -714,8 +771,24 @@
                     const reader = new FileReader();
                     readerPromises.push(new Promise((resolve, reject) => {
                         reader.onload = (e) => {
-                            newPart.images.push(e.target.result);
-                            resolve();
+                            const img = new Image();
+                            img.src = e.target.result;
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
+                                canvas.width = img.width;
+                                canvas.height = img.height;
+                                ctx.drawImage(img, 0, 0);
+                                canvas.toBlob((blob) => {
+                                    const webpReader = new FileReader();
+                                    webpReader.onload = (webpEvent) => {
+                                        newPart.images.push(webpEvent.target.result);
+                                        resolve();
+                                    };
+                                    webpReader.onerror = reject;
+                                    webpReader.readAsDataURL(blob);
+                                }, 'image/webp');
+                            };
                         };
                         reader.onerror = reject;
                         reader.readAsDataURL(file);
