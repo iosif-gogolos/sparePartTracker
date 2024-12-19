@@ -476,6 +476,7 @@
                 }
             });
 
+
             function loadPartsFromStorage() {
                 storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
                 filteredParts = storedParts;
@@ -575,29 +576,29 @@
 
             function loadPartToForm(part) {
                 document.getElementById('licensePlate').value = part.licensePlate;
-            document.getElementById('partNumber').value = part.partNumber;
-            document.getElementById('description').value = part.description;
-            document.getElementById('complaintDate').value = part.complaintDate;
-            document.getElementById('reason').value = part.reason;
-            document.getElementById('price').value = part.price;
-            document.getElementById('remarks').value = part.remarks;
-            document.getElementById('creditAvailable').value = part.creditAvailable;
-            addButton.textContent = 'Speichern';
-            isEditing = true;
-            editingId = part.id;
+                document.getElementById('partNumber').value = part.partNumber;
+                document.getElementById('description').value = part.description;
+                document.getElementById('complaintDate').value = part.complaintDate;
+                document.getElementById('reason').value = part.reason;
+                document.getElementById('price').value = part.price;
+                document.getElementById('remarks').value = part.remarks;
+                document.getElementById('creditAvailable').value = part.creditAvailable;
+                addButton.textContent = 'Speichern';
+                isEditing = true;
+                editingId = part.id;
 
-            // Bilder laden
-            imagePreviewContainer.innerHTML = '';
-            part.images.forEach((src, index) => {
-                const img = document.createElement('div');
-                img.classList.add('image-preview');
-                img.innerHTML = `
-                    <img src="${src}" alt="Preview">
-                    <button class="remove-button" data-index="${index}">&times;</button>
-                `;
-                imagePreviewContainer.appendChild(img);
-            });
-        }
+                // Bilder laden
+                imagePreviewContainer.innerHTML = '';
+                part.images.forEach((src, index) => {
+                    const img = document.createElement('div');
+                    img.classList.add('image-preview');
+                    img.innerHTML = `
+                        <img src="${src}" alt="Preview">
+                        <button class="remove-button" data-index="${index}">&times;</button>
+                    `;
+                    imagePreviewContainer.appendChild(img);
+                });
+            }
 
             function savePartToStorage(part) {
                 storedParts.push(part);
@@ -751,20 +752,20 @@
                 const mainFolder = zip.folder(folderName);
                 const imagesFolder = mainFolder.folder('Bilder');
 
-                // Export der Liste als CSV
+                // Exportiere die Liste als CSV
                 const worksheet = XLSX.utils.json_to_sheet(storedParts);
                 const csv = XLSX.utils.sheet_to_csv(worksheet);
                 mainFolder.file('Liste.csv', csv);
-                
-                // Hinzufügen der Bilder
+
+                // Füge die Bilder hinzu
                 storedParts.forEach(part => {
                     const partFolderName = `${part.licensePlate}-${part.partNumber}-${new Date(part.complaintDate).toLocaleDateString('de-DE')}`;
                     const partFolder = imagesFolder.folder(partFolderName);
                     part.images.forEach((image, index) => {
                         const base64Data = image.split(',')[1];
                         partFolder.file(`Bild-${index + 1}.jpg`, base64Data, { base64: true });
-                    })
-                })
+                    });
+                });
 
                 // Generiere das ZIP-Archiv und speichere es
                 zip.generateAsync({ type: 'blob' }).then(content => {
