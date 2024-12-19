@@ -417,7 +417,6 @@
             const partImagesInput = document.getElementById('partImages');
             const uploadImagesButton = document.getElementById('uploadImagesButton');
             const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-            
             let imageFiles = [];
             let uniqueId = 0;
             let isEditing = false;
@@ -501,7 +500,7 @@
                 newRow.setAttribute('data-id', part.id);
 
                 for (const key in part) {
-                    if (key === 'id') continue;
+                    if (key === 'id' || key === 'images') continue;
                     const cell = document.createElement('td');
                     cell.textContent = key === 'complaintDate' && part[key]
                         ? new Date(part[key]).toLocaleDateString('de-DE')
@@ -576,29 +575,29 @@
 
             function loadPartToForm(part) {
                 document.getElementById('licensePlate').value = part.licensePlate;
-                document.getElementById('partNumber').value = part.partNumber;
-                document.getElementById('description').value = part.description;
-                document.getElementById('complaintDate').value = part.complaintDate;
-                document.getElementById('reason').value = part.reason;
-                document.getElementById('price').value = part.price;
-                document.getElementById('remarks').value = part.remarks;
-                document.getElementById('creditAvailable').value = part.creditAvailable;
-                addButton.textContent = 'Speichern';
-                isEditing = true;
-                editingId = part.id;
+            document.getElementById('partNumber').value = part.partNumber;
+            document.getElementById('description').value = part.description;
+            document.getElementById('complaintDate').value = part.complaintDate;
+            document.getElementById('reason').value = part.reason;
+            document.getElementById('price').value = part.price;
+            document.getElementById('remarks').value = part.remarks;
+            document.getElementById('creditAvailable').value = part.creditAvailable;
+            addButton.textContent = 'Speichern';
+            isEditing = true;
+            editingId = part.id;
 
-                // Bilder laden
-                imagePreviewContainer.innerHTML = '';
-                part.images.forEach((src, index) => {
-                    const img = document.createElement('div');
-                    img.classList.add('image-preview');
-                    img.innerHTML = `
-                        <img src="${src}" alt="Preview">
-                        <button class="remove-button" data-index="${index}">&times;</button>
-                    `;
-                    imagePreviewContainer.appendChild(img);
-                });
-            }
+            // Bilder laden
+            imagePreviewContainer.innerHTML = '';
+            part.images.forEach((src, index) => {
+                const img = document.createElement('div');
+                img.classList.add('image-preview');
+                img.innerHTML = `
+                    <img src="${src}" alt="Preview">
+                    <button class="remove-button" data-index="${index}">&times;</button>
+                `;
+                imagePreviewContainer.appendChild(img);
+            });
+        }
 
             function savePartToStorage(part) {
                 storedParts.push(part);
@@ -708,12 +707,6 @@
                     creditAvailable: document.getElementById('creditAvailable').value,
                     images: []
                 };
-
-                const files = partImagesInput.files;
-                if (files.length > 5) {
-                    alert("Sie können maximal 5 Bilder hochladen.");
-                    return;
-                }
 
                 const readerPromises = [];
                 imageFiles.forEach((file, index) => {
