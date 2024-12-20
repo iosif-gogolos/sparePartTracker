@@ -579,7 +579,6 @@
                 partImagesInput.click();
             });
 
-            /*
             partImagesInput.addEventListener('change', () => {
                 if (partImagesInput.files.length > 0) {
                     const file = partImagesInput.files[0];
@@ -590,24 +589,6 @@
                     };
                     reader.readAsDataURL(file);
                 }
-            });*/
-
-            confirmImageButton.addEventListener('click', () => {
-                const img = document.createElement('div');
-                img.classList.add('image-preview');
-                img.innerHTML = `
-                    <img src="${previewImage.src}" alt="Preview">
-                    <button class="remove-button" data-index="${currentStep}">&times;</button>
-                `;
-                imagePreviewContainer.appendChild(img);
-                imageFiles.push(previewImage.src);
-                currentStep++;
-                if (currentStep < photoGuideSteps.length) {
-                    photoGuideText.textContent = photoGuideSteps[currentStep];
-                } else {
-                    photoGuideText.textContent = "Alle Fotos aufgenommen.";
-                }
-                imagePreviewOverlay.style.display = 'none';
             });
 
             retakeImageButton.addEventListener('click', () => {
@@ -773,17 +754,6 @@
                     reader.readAsDataURL(file);
                 });
             });*/
-            partImagesInput.addEventListener('change', () => {
-                if (partImagesInput.files.length > 0) {
-                    const file = partImagesInput.files[0];
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        previewImage.src = e.target.result;
-                        imagePreviewOverlay.style.display = 'flex';
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
 
             confirmImageButton.addEventListener('click', () => {
                 const img = document.createElement('div');
