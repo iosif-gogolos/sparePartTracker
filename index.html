@@ -374,7 +374,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Ersatz-WAP</h1>
+        <h1>Ersatzteil-Tracker</h1>
 
         <div id="dashboard" class="hidden">
             <h2>Dashboard</h2>
@@ -428,22 +428,27 @@
                 <option value="Nein" selected>Nein</option>
             </select>
 
-            <!-- Bilder hinzufügen -->
+            <!-- Fotoguide -->
+        
+            <div class="photo-guide" id="photoGuide">
+                <h3>Fotoguide</h3>
+                <p id="photoGuideText">Foto 1: Bitte mach ein Foto vom Versandkarton</p>
+                <button type="button" id="uploadImagesButton" title="Bilder hochladen">
+                    <span class="material-icons">camera_alt</span>
+                </button>
+            </div>
+
+            <input type="file" id="partImages" accept="image/*" capture="environment" multiple class="hidden">
+            <div id="imagePreviewContainer"></div>
+
+
+            <!-- Bilder hinzufügen 
             <label for="partImages">Bilder hochladen</label>
             <input type="file" id="partImages" accept="image/*" multiple class="hidden">
             <button type="button" id="uploadImagesButton" title="Bilder hochladen">
                 <span class="material-icons">camera_alt</span>
             </button>
-            
-            <!-- Fotoguide -->
-            
-            <div class="photo-guide" id="photoGuide">
-                <h3>Fotoguide</h3>
-                <p id="photoGuideText">Foto 1: Bitte mach ein Foto vom Versandkarton<br/></p>
-                <button type="button" id="startCameraButton">Bild hinzufügen</button>
-            </div>
-            <input type="file" id="partImages" accept="image/*" capture="environment" multiple class="hidden">
-            <div id="imagePreviewContainer"></div>
+            <div id="imagePreviewContainer"></div>-->
 
             <!-- Bildvorschau-Overlay -->
             <div class="image-preview-overlay" id="imagePreviewOverlay">
@@ -452,6 +457,16 @@
                 <div>
                     <button id="confirmImageButton">Bild bestätigen</button>
                     <button id="retakeImageButton">Bild erneut aufnehmen</button>
+                </div>
+            </div>
+
+            <!-- Bildbestätigungs-Dialog -->
+            <div class="photo-confirmation-dialog" id="photoConfirmationDialog">
+                <div class="dialog-content">
+                    <img id="confirmationImage" src="" alt="Confirmation image">
+                    <p>Ist dieses Bild in Ordnung?</p>
+                    <button id="confirmButton">Ja</button>
+                    <button id="retakeButton">Nein</button>
                 </div>
             </div>
             <button type="submit">Hinzufügen</button>
@@ -552,7 +567,7 @@
             const previewImage = document.getElementById('previewImage');
             const closePreviewButton = document.getElementById('closePreviewButton');
             const photoGuideText = document.getElementById('photoGuideText');
-            const startCameraButton = document.getElementById('startCameraButton');
+            //const startCameraButton = document.getElementById('startCameraButton');
             const confirmImageButton = document.getElementById('confirmImageButton');
             const retakeImageButton = document.getElementById('retakeImageButton');
             const photoGuideSteps = [
@@ -578,10 +593,10 @@
             uploadImagesButton.addEventListener('click', () => {
                 partImagesInput.click();
             });
-
+            /*
             startCameraButton.addEventListener('click', () => {
                 partImagesInput.click();
-            });
+            });*/
 
             partImagesInput.addEventListener('change', () => {
                 imagePreviewContainer.innerHTML = '';
