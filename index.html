@@ -429,7 +429,7 @@
             </select>
 
             <!-- Bilder hinzufügen -->
-            <label for="partImages">Bilder hochladen (max. 5)</label>
+            <label for="partImages">Bilder hochladen</label>
             <input type="file" id="partImages" accept="image/*" multiple class="hidden">
             <button type="button" id="uploadImagesButton" title="Bilder hochladen">
                 <span class="material-icons">camera_alt</span>
@@ -581,22 +581,52 @@
             let storedParts = [];
             let filteredParts = [];
 
-           
+            uploadImagesButton.addEventListener('click', () => {
+                partImagesInput.click();
+            });
 
             startCameraButton.addEventListener('click', () => {
                 partImagesInput.click();
             });
 
             partImagesInput.addEventListener('change', () => {
-                if (partImagesInput.files.length > 0) {
-                    const file = partImagesInput.files[0];
+                imagePreviewContainer.innerHTML = '';
+                imageFiles = Array.from(partImagesInput.files);
+                if (imageFiles.length > 9) {
+                    alert("Sie können maximal 9 Bilder hochladen.");
+                    partImagesInput.value = '';
+                    imageFiles = [];
+                    return;
+                }
+                imageFiles.forEach((file, index) => {
                     const reader = new FileReader();
-                    reader.onload = (e) => {
-                        previewImage.src = e.target.result;
-                        imagePreviewOverlay.style.display = 'flex';
+                    reader.onload = async (e) => {
+                        const img = document.createElement('div');
+                        img.classList.add('image-preview');
+                        img.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview">
+                            <button class="remove-button" data-index="${index}">&times;</button>
+                        `;
+                        imagePreviewContainer.appendChild(img);
+
+                        // Perform OCR on the image
+                        const ocrText = await performOCR(e.target.result);
+                        console.log(`OCR Result for image ${index + 1}:`, ocrText);
+                        const ocrResultDiv = document.createElement('div');
+                        ocrResultDiv.classList.add('ocr-result');
+                        ocrResultDiv.textContent = `OCR Result: ${ocrText}`;
+                        img.appendChild(ocrResultDiv);
+
+                        // Update photo guide step
+                        if (currentStep < photoGuideSteps.length) {
+                            photoGuideText.textContent = photoGuideSteps[currentStep];
+                            currentStep++;
+                        } else {
+                            photoGuideText.textContent = "Alle Fotos aufgenommen.";
+                        }
                     };
                     reader.readAsDataURL(file);
-                }
+                });
             });
 
             retakeImageButton.addEventListener('click', () => {
