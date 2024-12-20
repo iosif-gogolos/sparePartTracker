@@ -438,15 +438,6 @@
             <input type="file" id="partImages" accept="image/*" capture="environment" multiple class="hidden">
             <div id="imagePreviewContainer"></div>
 
-            <!-- Bildvorschau-Overlay -->
-            <div class="image-preview-overlay" id="imagePreviewOverlay">
-                <button class="close-button" id="closePreviewButton">&times;</button>
-                <img id="previewImage" src="" alt="Preview image">
-                <div>
-                    <button id="confirmImageButton">Bild bestätigen</button>
-                    <button id="retakeImageButton">Bild erneut aufnehmen</button>
-                </div>
-            </div>
 
             <!-- Bilder hinzufügen 
             <label for="partImages">Bilder hochladen</label>
@@ -551,7 +542,6 @@
             const photoGuideText = document.getElementById('photoGuideText');
             const startCameraButton = document.getElementById('startCameraButton');
             const confirmImageButton = document.getElementById('confirmImageButton');
-            const retakeImageButton = document.getElementById('retakeImageButton');
             const photoGuideSteps = [
                 "Foto 1: Bitte mach ein Foto vom Versandkarton",
                 "Foto 2: Mache ein zweites Foto von Versandkarton (z.B. vom Versandetikett)",
@@ -609,11 +599,6 @@
                 imagePreviewOverlay.style.display = 'none';
             });
 
-            retakeImageButton.addEventListener('click', () => {
-                partImagesInput.value = '';
-                imagePreviewOverlay.style.display = 'none';
-            });
-
             closePreviewButton.addEventListener('click', () => {
                 imagePreviewOverlay.style.display = 'none';
             });
@@ -656,44 +641,38 @@
 
             function addPartToTable(part) {
                 const newRow = document.createElement('tr');
-                newRow.setAttribute('data-id', part.id);
-
-                for (const key in part) {
-                    if (key === 'id') continue;
-                    const cell = document.createElement('td');
-                    cell.textContent = key === 'complaintDate' && part[key]
-                        ? new Date(part[key]).toLocaleDateString('de-DE')
-                        : part[key];
-                    newRow.appendChild(cell);
-                }
-
-                const actionsCell = document.createElement('td');
-                actionsCell.innerHTML = `
-                    <button class="icon-button delete-btn" title="Löschen">
-                        <span class="material-icons">delete</span>
-                    </button>
-                    <button class="icon-button edit-btn" title="Bearbeiten">
-                        <span class="material-icons">edit</span>
-                    </button>
-                    <button class="icon-button view-images-btn" title="Bilder anzeigen">
-                        <span class="material-icons">photo</span>
-                    </button>
+                //const newRow = document.createElement('tr');
+                newRow.dataset.id = part.id;
+                newRow.innerHTML = `
+                    <td>${part.licensePlate}</td>
+                    <td>${part.partNumber}</td>
+                    <td>${part.description}</td>
+                    <td>${part.complaintDate}</td>
+                    <td>${part.reason}</td>
+                    <td>${part.price}</td>
+                    <td>${part.remarks}</td>
+                    <td>${part.creditAvailable}</td>
+                    <td>
+                        <button class="icon-button delete-btn" title="Löschen">
+                            <span class="material-icons">delete</span>
+                        </button>
+                        <button class="icon-button edit-btn" title="Bearbeiten">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button class="icon-button view-images-btn" title="Bilder anzeigen">
+                            <span class="material-icons">photo</span>
+                        </button>
+                    </td>
                 `;
-                actionsCell.querySelector('.delete-btn').addEventListener('click', () => {
-                    if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`))
+                newRow.querySelector('.delete-btn').addEventListener('click', () => {
+                    if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`)) {
                         removePartFromTable(part.id);
-                });
-                actionsCell.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
-                actionsCell.querySelector('.view-images-btn').addEventListener('click', () => {
-                    if (part.images.length === 0) {
-                        if (confirm("Es wurden noch keine Bilder hinzugefügt. Möchten Sie jetzt Bilder hinzufügen?")) {
-                            partImagesInput.click();
-                        }
-                    } else {
-                        viewImages(part.images);
                     }
                 });
-                newRow.appendChild(actionsCell);
+                newRow.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
+                newRow.querySelector('.view-images-btn').addEventListener('click', () => {
+                    viewImages(part.images);
+                });
                 partsTableBody.appendChild(newRow);
             }
 
@@ -709,7 +688,7 @@
                 localStorage.setItem('partsData', JSON.stringify(updatedParts));
                 document.querySelector(`tr[data-id="${id}"]`).remove();
             }
-
+            /*
             function viewImages(images) {
                 const imageModal = document.createElement('div');
                 imageModal.classList.add('image-modal');
@@ -727,13 +706,20 @@
                     img.src = src;
                     img.classList.add('image-preview');
                     imageGallery.appendChild(img);
-                });
+                }); 
+                
+            }*/
+           function viewImages(images) {
+                    if (images.length > 0) {
+                        previewImage.src = images[0];
+                        imagePreviewOverlay.style.display = 'flex';
+                    }
+                }
 
-                const closeButton = imageModal.querySelector('.close-button');
-                closeButton.addEventListener('click', () => {
-                    document.body.removeChild(imageModal);
-                });
-            }
+            const closeButton = imageModal.querySelector('.close-button');
+            closeButton.addEventListener('click', () => {
+                document.body.removeChild(imageModal);
+            });
 
             /*
             partImagesInput.addEventListener('change', () => {
@@ -914,7 +900,7 @@
                 partsTableBody.appendChild(newRow);
             }
 
-            
+            /*
             function viewImages(images) {
                 const imageModal = document.createElement('div');
                 imageModal.classList.add('image-modal');
@@ -938,7 +924,7 @@
                 closeButton.addEventListener('click', () => {
                     document.body.removeChild(imageModal);
                 });
-            } 
+            } */
 
             // OCR Erkennung
             async function performOCR(imageSrc) {
