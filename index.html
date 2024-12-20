@@ -623,62 +623,63 @@
                     price: document.getElementById('price').value,
                     remarks: document.getElementById('remarks').value,
                     creditAvailable: document.getElementById('creditAvailable').value,
-                    images: imageFiles
+                    images: []
                 };
 
-                addPartToTable(newPart);
-                savePartToStorage(newPart);
-
-                addPartForm.reset();
-                imagePreviewContainer.innerHTML = '';
-                imageFiles = [];
-                currentStep = 0;
-                photoGuideText.textContent = photoGuideSteps[currentStep];
-            });
-
-            function addPartToTable(part) {
-                const newRow = document.createElement('tr');
-                newRow.setAttribute('data-id', part.id);
-                
-                for (const key in part) {
-                    if (key === 'id' || key === 'images') continue;
-                    const cell = document.createElement('td');
-                    cell.textContent = key === 'complaintDate' && part[key]
-                        ? new Date(part[key]).toLocaleDateString('de-DE')
-                        : part[key];
-                    newRow.appendChild(cell);
-                }
-
-                const actionsCell = document.createElement('td');
-                actionsCell.innerHTML = `
-                    <button class="icon-button delete-btn" title="Löschen">
-                        <span class="material-icons">delete</span>
-                    </button>
-                    <button class="icon-button edit-btn" title="Bearbeiten">
-                        <span class="material-icons">edit</span>
-                    </button>
-                    <button class="icon-button view-images-btn" title="Bilder anzeigen">
-                        <span class="material-icons">photo</span>
-                    </button>
-                `;
-                actionsCell.querySelector('.delete-btn').addEventListener('click', () => {
-                    if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`))
-                        removePartFromTable(part.id);
-                }); 
-
-                actionsCell.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
-                actionsCell.querySelector('.view-images-btn').addEventListener('click', () => {
-                    if (part.images.length === 0) {
-                        if (confirm("Es wurden noch keine Bilder hinzugefügt. Möchten Sie jetzt Bilder hinzufügen?")) {
-                            partImagesInput.click();
-                        }
-                    } else {
-                        viewImages(part.images);
-                    }
+                const readerPromises = [];
+                imageFiles.forEach((file, index) => {
+                    const reader = new FileReader();
+                    readerPromises.push(new Promise((resolve, reject) => {
+                        reader.onload = (e) => {
+                            const img = new Image();
+                            img.src = e.target.result;
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
+                                canvas.width = img.width;
+                                canvas.height = img.height;
+                                ctx.drawImage(img, 0, 0);
+                                canvas.toBlob((blob) => {
+                                    const webpReader = new FileReader();
+                                    webpReader.onload = (webpEvent) => {
+                                        newPart.images.push(webpEvent.target.result);
+                                        resolve();
+                                    };
+                                    webpReader.onerror = reject;
+                                    webpReader.readAsDataURL(blob);
+                                }, 'image/webp');
+                            };
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    }));
                 });
-                newRow.appendChild(actionsCell);
-                partsTableBody.appendChild(newRow);
-            }
+
+                Promise.all(readerPromises).then(() => {
+                    if (isEditing) {
+                        updatePartInStorage(newPart);
+                        document.querySelector(`tr[data-id="${editingId}"]`)?.remove();
+                        addPartToTable(newPart);
+                        isEditing = false;
+                        editingId = null;
+                        addButton.textContent = 'Hinzufügen';
+                    } else {
+                        addPartToTable(newPart);
+                        savePartToStorage(newPart);
+                    }
+
+                    exportButton.classList.remove('hidden');
+                    addPartForm.reset();
+                    imagePreviewContainer.innerHTML = '';
+                    imageFiles = [];
+                    currentStep = 0;
+                    photoGuideText.textContent = photoGuideSteps[currentStep];  
+                    updateDashboard();
+                    updateClearButtonVisibility();
+                }).catch(error => {
+                    console.error("Fehler beim Lesen der Bilder:", error);
+                });
+            });
 
             function savePartToStorage(part) {
                 const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
@@ -1056,75 +1057,6 @@
                 clearSearchButton.classList.add('hidden');
             });
 
-            addPartForm.addEventListener('submit', event => {
-                event.preventDefault();
-
-                const newPart = {
-                    id: isEditing ? editingId : uniqueId++,
-                    licensePlate: document.getElementById('licensePlate').value,
-                    partNumber: document.getElementById('partNumber').value,
-                    description: document.getElementById('description').value,
-                    complaintDate: document.getElementById('complaintDate').value,
-                    reason: document.getElementById('reason').value,
-                    price: document.getElementById('price').value,
-                    remarks: document.getElementById('remarks').value,
-                    creditAvailable: document.getElementById('creditAvailable').value,
-                    images: []
-                };
-
-                const readerPromises = [];
-                imageFiles.forEach((file, index) => {
-                    const reader = new FileReader();
-                    readerPromises.push(new Promise((resolve, reject) => {
-                        reader.onload = (e) => {
-                            const img = new Image();
-                            img.src = e.target.result;
-                            img.onload = () => {
-                                const canvas = document.createElement('canvas');
-                                const ctx = canvas.getContext('2d');
-                                canvas.width = img.width;
-                                canvas.height = img.height;
-                                ctx.drawImage(img, 0, 0);
-                                canvas.toBlob((blob) => {
-                                    const webpReader = new FileReader();
-                                    webpReader.onload = (webpEvent) => {
-                                        newPart.images.push(webpEvent.target.result);
-                                        resolve();
-                                    };
-                                    webpReader.onerror = reject;
-                                    webpReader.readAsDataURL(blob);
-                                }, 'image/webp');
-                            };
-                        };
-                        reader.onerror = reject;
-                        reader.readAsDataURL(file);
-                    }));
-                });
-
-                Promise.all(readerPromises).then(() => {
-                    if (isEditing) {
-                        updatePartInStorage(newPart);
-                        document.querySelector(`tr[data-id="${editingId}"]`)?.remove();
-                        addPartToTable(newPart);
-                        isEditing = false;
-                        editingId = null;
-                        addButton.textContent = 'Hinzufügen';
-                    } else {
-                        addPartToTable(newPart);
-                        savePartToStorage(newPart);
-                    }
-
-                    exportButton.classList.remove('hidden');
-                    addPartForm.reset();
-                    imagePreviewContainer.innerHTML = '';
-                    imageFiles = [];
-                    updateDashboard();
-                    updateClearButtonVisibility();
-                }).catch(error => {
-                    console.error("Fehler beim Lesen der Bilder:", error);
-                });
-            });
-
             exportButton.addEventListener('click', () => {
                 const zip = new JSZip();
                 const folderName = `Retoure-Ersatzteil-${new Date().toLocaleDateString('de-DE')}`;
@@ -1222,13 +1154,6 @@
                     reader.readAsArrayBuffer(file);
                 }
             });
-            
-            /*
-            window.onload = () => {
-                loadPartsFromStorage();
-                updateDashboard();
-                updateClearButtonVisibility();
-            }; */
 
             window.onload = () => {
                 loadPartsFromStorage();
