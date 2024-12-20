@@ -374,7 +374,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>WAP7</h1>
+        <h1>ET-Manager Markgröningen</h1>
 
         <div id="dashboard" class="hidden">
             <h2>Dashboard</h2>
@@ -447,15 +447,6 @@
                     <button id="retakeImageButton">Bild erneut aufnehmen</button>
                 </div>
             </div>
-            <!-- Bildbestätigungs-Dialog -->
-            <div class="photo-confirmation-dialog" id="photoConfirmationDialog">
-                <div class="dialog-content">
-                    <img id="confirmationImage" src="" alt="Confirmation image">
-                    <p>Ist dieses Bild in Ordnung?</p>
-                    <button id="confirmButton">Ja</button>
-                    <button id="retakeButton">Nein</button>
-                </div>
-            </div>
 
             <!-- Bilder hinzufügen 
             <label for="partImages">Bilder hochladen</label>
@@ -464,27 +455,6 @@
                 <span class="material-icons">camera_alt</span>
             </button>
             <div id="imagePreviewContainer"></div>-->
-
-            <!-- Bildvorschau-Overlay -->
-            <div class="image-preview-overlay" id="imagePreviewOverlay">
-                <button class="close-button" id="closePreviewButton">&times;</button>
-                <img id="previewImage" src="" alt="Preview image">
-                <div>
-                    <button id="confirmImageButton">Bild bestätigen</button>
-                    <button id="retakeImageButton">Bild erneut aufnehmen</button>
-                </div>
-            </div>
-
-            <!-- Bildbestätigungs-Dialog -->
-            <div class="photo-confirmation-dialog" id="photoConfirmationDialog">
-                <div class="dialog-content">
-                    <img id="confirmationImage" src="" alt="Confirmation image">
-                    <p>Ist dieses Bild in Ordnung?</p>
-                    <button id="confirmButton">Ja</button>
-                    <button id="retakeButton">Nein</button>
-                </div>
-            </div>
-            
             <!-- Submit button -->
             <button type="submit">Hinzufügen</button>
         </form>      
@@ -584,7 +554,7 @@
             const retakeImageButton = document.getElementById('retakeImageButton');
             const photoGuideSteps = [
                 "Foto 1: Bitte mach ein Foto vom Versandkarton",
-                "Foto 2: Mache ein zweites Foto von Versandkarton",
+                "Foto 2: Mache ein zweites Foto von Versandkarton (z.B. vom Versandetikett)",
                 "Foto 3: Mache ein Foto vom verpackten Ersatzteil (in der Regel in der Folie im Karton)",
                 "Foto 4: Mache ein zweites Foto vom verpackten Ersatzteil",
                 "Foto 5: Mache ein Foto von dem beschädigten Ersatzteil",
@@ -765,7 +735,7 @@
                 });
             }
 
-
+            /*
             partImagesInput.addEventListener('change', () => {
                 imagePreviewContainer.innerHTML = '';
                 imageFiles = Array.from(partImagesInput.files);
@@ -804,9 +774,38 @@
                     };
                     reader.readAsDataURL(file);
                 });
+            });*/
+            partImagesInput.addEventListener('change', () => {
+                if (partImagesInput.files.length > 0) {
+                    const file = partImagesInput.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        previewImage.src = e.target.result;
+                        imagePreviewOverlay.style.display = 'flex';
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
-            
-            
+
+            confirmImageButton.addEventListener('click', () => {
+                const img = document.createElement('div');
+                img.classList.add('image-preview');
+                img.innerHTML = `
+                    <img src="${previewImage.src}" alt="Preview">
+                    <button class="remove-button" data-index="${currentStep}">&times;</button>
+                `;
+                imagePreviewContainer.appendChild(img);
+                imageFiles.push(previewImage.src);
+                currentStep++;
+                if (currentStep < photoGuideSteps.length) {
+                    photoGuideText.textContent = photoGuideSteps[currentStep];
+                } else {
+                    photoGuideText.textContent = "Alle Fotos aufgenommen.";
+                }
+                imagePreviewOverlay.style.display = 'none';
+            });
+                
+            /*
             imagePreviewContainer.addEventListener('click', (e) => {
                 if (e.target.classList.contains('remove-button')) {
                     const index = e.target.getAttribute('data-index');
@@ -834,6 +833,20 @@
                         };
                         reader.readAsDataURL(file);
                     });
+                }
+            });*/
+
+            imagePreviewContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-button')) {
+                    const index = e.target.getAttribute('data-index');
+                    imageFiles.splice(index, 1);
+                    e.target.parentElement.remove();
+                    currentStep--;
+                    if (currentStep < photoGuideSteps.length) {
+                        photoGuideText.textContent = photoGuideSteps[currentStep];
+                    } else {
+                        photoGuideText.textContent = "Alle Fotos aufgenommen.";
+                    }
                 }
             });
 
