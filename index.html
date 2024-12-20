@@ -580,7 +580,7 @@
             startCameraButton.addEventListener('click', () => {
                 partImagesInput.click();
             });
-
+            /*
             partImagesInput.addEventListener('change', () => {
                 if (partImagesInput.files.length > 0) {
                     const file = partImagesInput.files[0];
@@ -591,7 +591,7 @@
                     };
                     reader.readAsDataURL(file);
                 }
-            });
+            });*/
 
             confirmImageButton.addEventListener('click', () => {
                 const img = document.createElement('div');
@@ -708,18 +708,13 @@
                 }
             }
 
-            window.onload = () => {
-                const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
-                storedParts.forEach(part => addPartToTable(part));
-            };
-
-            /*
+            
 
             partImagesInput.addEventListener('change', () => {
                 imagePreviewContainer.innerHTML = '';
                 imageFiles = Array.from(partImagesInput.files);
-                if (imageFiles.length > 5) {
-                    alert("Sie können maximal 5 Bilder hochladen.");
+                if (imageFiles.length > 9) {
+                    alert("Sie können maximal 9 Bilder hochladen.");
                     partImagesInput.value = '';
                     imageFiles = [];
                     return;
@@ -776,7 +771,7 @@
                         reader.readAsDataURL(file);
                     });
                 }
-            });*/
+            });
 
 
             function loadPartsFromStorage() {
@@ -842,14 +837,7 @@
                 partsTableBody.appendChild(newRow);
             }
 
-            function viewImages(images) {
-                if (images.length > 0) {
-                    previewImage.src = images[0];
-                    imagePreviewOverlay.style.display = 'flex';
-                }
-            }
             
-            /*
             function viewImages(images) {
                 const imageModal = document.createElement('div');
                 imageModal.classList.add('image-modal');
@@ -873,7 +861,7 @@
                 closeButton.addEventListener('click', () => {
                     document.body.removeChild(imageModal);
                 });
-            } */
+            } 
 
             // OCR Erkennung
             async function performOCR(imageSrc) {
