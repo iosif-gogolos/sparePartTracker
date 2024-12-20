@@ -438,13 +438,13 @@
             <input type="file" id="partImages" accept="image/*" capture="environment" multiple class="hidden">
             <div id="imagePreviewContainer"></div>
 
-            <div class="photo-confirmation-dialog" id="photoConfirmationDialog">
-                <div class="dialog-content">
-                    <img id="confirmImageButton" src="" alt="Confirmation image">
-                    <img id="retakeImageButton" src="" alt="Retake image">
-                    <p>Ist dieses Bild in Ordnung?</p>
-                    <button id="confirmImageButton">Ja</button>
-                    <button id="retakeImageButton">Nein</button>
+            <!-- Bildvorschau-Overlay -->
+            <div class="image-preview-overlay" id="imagePreviewOverlay">
+                <button class="close-button" id="closePreviewButton">&times;</button>
+                <img id="previewImage" src="" alt="Preview image">
+                <div>
+                    <button id="confirmImageButton">Bild bestätigen</button>
+                    <button id="retakeImageButton">Bild erneut aufnehmen</button>
                 </div>
             </div>
 
