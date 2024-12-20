@@ -427,6 +427,14 @@
                 <option value="Ja">Ja</option>
                 <option value="Nein" selected>Nein</option>
             </select>
+
+            <!-- Bilder hinzufügen -->
+            <label for="partImages">Bilder hochladen (max. 5)</label>
+            <input type="file" id="partImages" accept="image/*" multiple class="hidden">
+            <button type="button" id="uploadImagesButton" title="Bilder hochladen">
+                <span class="material-icons">camera_alt</span>
+            </button>
+            <div id="imagePreviewContainer"></div>
             
             <!-- Fotoguide -->
             
