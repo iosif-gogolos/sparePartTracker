@@ -441,9 +441,10 @@
             <div class="photo-confirmation-dialog" id="photoConfirmationDialog">
                 <div class="dialog-content">
                     <img id="confirmImageButton" src="" alt="Confirmation image">
+                    <img id="retakeImageButton" src="" alt="Retake image">
                     <p>Ist dieses Bild in Ordnung?</p>
-                    <button id="confirmButton">Ja</button>
-                    <button id="retakeButton">Nein</button>
+                    <button id="confirmImageButton">Ja</button>
+                    <button id="retakeImageButton">Nein</button>
                 </div>
             </div>
 
@@ -551,6 +552,7 @@
             const photoGuideText = document.getElementById('photoGuideText');
             const startCameraButton = document.getElementById('startCameraButton');
             const confirmImageButton = document.getElementById('confirmImageButton');
+            const retakeImageButton = document.getElementById('retakeImageButton');
             const photoGuideSteps = [
                 "Foto 1: Bitte mach ein Foto vom Versandkarton",
                 "Foto 2: Mache ein zweites Foto von Versandkarton (z.B. vom Versandetikett)",
@@ -605,6 +607,11 @@
                 } else {
                     photoGuideText.textContent = "Alle Fotos aufgenommen.";
                 }
+                imagePreviewOverlay.style.display = 'none';
+            });
+
+            retakeImageButton.addEventListener('click', () => {
+                partImagesInput.value = '';
                 imagePreviewOverlay.style.display = 'none';
             });
 
