@@ -308,6 +308,68 @@
                 color: #333;
             }
 
+            .photo-guide {
+                margin-top: 1rem;
+                padding: 1rem;
+                background-color: #e6f7ff;
+                border-left: 4px solid #0056b3;
+                border-radius: 8px;
+                text-align: center;
+            }
+
+            .photo-guide h3 {
+                margin-bottom: 0.5;
+            }
+
+            .photo-guide p {
+                margin: 0;
+                font-size: 1rem;
+                color: #333;
+            }
+
+            .photo-confirmation-dialog {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                display: none;
+            }
+
+            .photo-confirmation-dialog .dialog-content {
+                background: white;
+                padding: 1rem;
+                border-radius: 8px;
+                text-align: center;
+            }
+
+            .photo-confirmation-dialog img {
+                max-width: 100%;
+                max-height: 300px;
+                margin-bottom: 1rem;
+            }
+
+            .photo-confirmation-dialog button {
+                background-color: #0056b3;
+                color: white;
+                border: none;
+                padding: 0.5rem 1rem;
+                font-size: 1rem;
+                cursor: pointer;
+                border-radius: 4px;
+                margin: 0 0.5rem;
+                transition: background-color 0.3s ease;
+            }
+
+            .photo-confirmation-dialog button:hover {
+                background-color: #003e70;
+            }
+
     </style>
 </head>
 <body>
@@ -345,7 +407,7 @@
             <input type="text" id="licensePlate" placeholder="Kennzeichen" required>
             <label for="partNumber">Teilenummer</label>
             <input type="text" id="partNumber" placeholder="Teilenummer" required>
-            <label for="description">Beschreibung</label>
+            <label for="description">Teil-Bezeichnung</label>
             <input type="text" id="description" placeholder="Beschreibung">
             <label for="complaintDate">Reklamationsdatum</label>
             <input type="date" id="complaintDate" required>
@@ -373,6 +435,32 @@
                 <span class="material-icons">camera_alt</span>
             </button>
             <div id="imagePreviewContainer"></div>
+
+            <!-- Fotoguide -->
+             <div class="photo-guide" id="photoGuide">
+                <h3>Fotoguide</h3>
+                <p id="photoGuideText">Foto 1: Bitte mach ein Foto vom Versandkarton</p>"
+             </div>
+
+            <!-- Bildvorschau-Overlay -->
+            <div class="image-preview-overlay" id="imagePreviewOverlay">
+                <button class="close-button" id="closePreviewButton">&times;</button>
+                <img id="previewImage" src="" alt="Preview image">
+                <div>
+                    <button id="confirmImageButton">Bild bestätigen</button>
+                    <button id="retakeImageButton">Bild erneut aufnehmen</button>
+                </div>
+            </div>
+
+            <!-- Bildbestätigungs-Dialog -->
+            <div class="photo-confirmation-dialog" id="photoConfirmationDialog">
+                <div class="dialog-content">
+                    <img id="confirmationImage" src="" alt="Confirmation image">
+                    <p>Ist dieses Bild in Ordnung?</p>
+                    <button id="confirmButton">Ja</button>
+                    <button id="retakeButton">Nein</button>
+                </div>
+            </div>
             
             <!-- Submit button -->
             <button type="submit">Hinzufügen</button>
@@ -408,6 +496,15 @@
             <button class="close-button" id="closePreviewButton">&times;</button>
             <img id="previewImage" src="" alt="Preview image">
 
+        </div>
+
+        <div class="photo-confirmation-dialog" id="photoConfirmationDialog">
+            <div class="dialog-content">
+                <img id="confirmationImage" src="" alt="Confirmation image">
+                <p>Ist dieses Bild in Ordnung?</p>
+                <button id="confirmButton">Ja</button>
+                <button id="retakeButton">Nein</button>
+            </div>
         </div>
 
         <table id="partsTable">
@@ -467,6 +564,20 @@
             const imagePreviewOverlay = document.getElementById('imagePreviewOverlay');
             const previewImage = document.getElementById('previewImage');
             const closePreviewButton = document.getElementById('closePreviewButton');
+            const photoGuideText = document.getElementById('photoGuideText');
+            const confirmImageButton = document.getElementById('confirmImageButton');
+            const retakeImageButton = document.getElementById('retakeImageButton');
+            const photoGuideSteps = [
+                "Foto 1: Bitte mach ein Foto vom Versandkarton",
+                "Foto 2: Mache ein zweites Foto von Versandkarton",
+                "Foto 3: Mache ein Foto vom verpackten Ersatzteil (in der Regel in der Folie im Karton)",
+                "Foto 4: Mache ein zweites Foto vom verpackten Ersatzteil",
+                "Foto 5: Mache ein Foto von dem beschädigten Ersatzteil",
+                "Foto 6: Mache ein zweites Foto von dem beschädigten Ersatzteil",
+                "Foto 7: Mache ein drittes Foto von dem beschädigten Ersatzteil",
+                "Foto 8: Mache ein viertes Foto von dem beschädigten Ersatzteil"
+            ];
+            let currentStep = 0;
             let imageFiles = [];
             let uniqueId = 0;
             let isEditing = false;
@@ -483,6 +594,57 @@
             closePreviewButton.addEventListener('click', () => {
                 imagePreviewOverlay.style.display = 'none';
             });
+
+            partImagesInput.addEventListener('change', () => {
+        if (partImagesInput.files.length > 0) {
+            const file = partImagesInput.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                imagePreviewOverlay.style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    confirmImageButton.addEventListener('click', () => {
+        const img = document.createElement('div');
+        img.classList.add('image-preview');
+        img.innerHTML = `
+            <img src="${previewImage.src}" alt="Preview">
+            <button class="remove-button" data-index="${currentStep}">&times;</button>
+        `;
+        imagePreviewContainer.appendChild(img);
+        imageFiles.push(previewImage.src);
+        currentStep++;
+        if (currentStep < photoGuideSteps.length) {
+            photoGuideText.textContent = photoGuideSteps[currentStep];
+        } else {
+            photoGuideText.textContent = "Alle Fotos aufgenommen.";
+        }
+        imagePreviewOverlay.style.display = 'none';
+    });
+
+    retakeImageButton.addEventListener('click', () => {
+        partImagesInput.value = '';
+        imagePreviewOverlay.style.display = 'none';
+    });
+
+    closePreviewButton.addEventListener('click', () => {
+        imagePreviewOverlay.style.display = 'none';
+    });
+
+    imagePreviewContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-button')) {
+            const index = e.target.getAttribute('data-index');
+            imageFiles.splice(index, 1);
+            e.target.parentElement.remove();
+            currentStep--;
+            photoGuideText.textContent = photoGuideSteps[currentStep];
+        }
+    });
+
+            /*
 
             partImagesInput.addEventListener('change', () => {
                 imagePreviewContainer.innerHTML = '';
@@ -515,7 +677,8 @@
                     reader.readAsDataURL(file);
                 });
             });
-
+            
+            
             imagePreviewContainer.addEventListener('click', (e) => {
                 if (e.target.classList.contains('remove-button')) {
                     const index = e.target.getAttribute('data-index');
@@ -544,7 +707,7 @@
                         reader.readAsDataURL(file);
                     });
                 }
-            });
+            });*/
 
 
             function loadPartsFromStorage() {
