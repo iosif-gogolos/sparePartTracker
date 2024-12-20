@@ -638,15 +638,7 @@
                 imagePreviewOverlay.style.display = 'none';
             });
 
-            imagePreviewContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('remove-button')) {
-                    const index = e.target.getAttribute('data-index');
-                    imageFiles.splice(index, 1);
-                    e.target.parentElement.remove();
-                    currentStep--;
-                    photoGuideText.textContent = photoGuideSteps[currentStep];
-                }
-            });
+           
 
             addPartForm.addEventListener('submit', event => {
                 event.preventDefault();
