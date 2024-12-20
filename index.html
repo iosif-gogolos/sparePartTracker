@@ -443,7 +443,6 @@
 
             <div id="imagePreviewContainer"></div>
 
-
             <!-- Bilder hinzufügen 
             <label for="partImages">Bilder hochladen</label>
             <input type="file" id="partImages" accept="image/*" multiple class="hidden">
@@ -581,6 +580,13 @@
             ];
             let currentStep = 0;
             let imageFiles = [];
+            let uniqueId = 0;
+            let isEditing = false;
+            let editingId = null;
+            let currentPage = 1;
+            let entriesPerPage = parseInt(entriesPerPageSelect.value, 10);
+            let storedParts = [];
+            let filteredParts = [];
 
             startCameraButton.addEventListener('click', () => {
                 partImagesInput.click();
@@ -639,7 +645,7 @@
                 event.preventDefault();
 
                 const newPart = {
-                    id: Date.now(),
+                    id: isEditing ? editingId : uniqueId++,
                     licensePlate: document.getElementById('licensePlate').value,
                     partNumber: document.getElementById('partNumber').value,
                     description: document.getElementById('description').value,
