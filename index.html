@@ -407,7 +407,7 @@
             <input type="text" id="licensePlate" placeholder="Kennzeichen" required>
             <label for="partNumber">Teilenummer</label>
             <input type="text" id="partNumber" placeholder="Teilenummer" required>
-            <label for="description">Teil-Bezeichnung</label>
+            <label for="description">Artikel, Bezeichnung</label>
             <input type="text" id="description" placeholder="Beschreibung">
             <label for="complaintDate">Reklamationsdatum</label>
             <input type="date" id="complaintDate" required>
@@ -430,25 +430,14 @@
 
             <!-- Fotoguide -->
         
-            <div class="photo-guide" id="photoGuide">
+            
+             <div class="photo-guide" id="photoGuide">
                 <h3>Fotoguide</h3>
                 <p id="photoGuideText">Foto 1: Bitte mach ein Foto vom Versandkarton</p>
-                <button type="button" id="uploadImagesButton" title="Bilder hochladen">
-                    <span class="material-icons">camera_alt</span>
-                </button>
+                <button type="button" id="uploadImagesButton">Bilder hinzufügen</button>
             </div>
-
             <input type="file" id="partImages" accept="image/*" capture="environment" multiple class="hidden">
             <div id="imagePreviewContainer"></div>
-
-
-            <!-- Bilder hinzufügen 
-            <label for="partImages">Bilder hochladen</label>
-            <input type="file" id="partImages" accept="image/*" multiple class="hidden">
-            <button type="button" id="uploadImagesButton" title="Bilder hochladen">
-                <span class="material-icons">camera_alt</span>
-            </button>
-            <div id="imagePreviewContainer"></div>-->
 
             <!-- Bildvorschau-Overlay -->
             <div class="image-preview-overlay" id="imagePreviewOverlay">
@@ -457,16 +446,6 @@
                 <div>
                     <button id="confirmImageButton">Bild bestätigen</button>
                     <button id="retakeImageButton">Bild erneut aufnehmen</button>
-                </div>
-            </div>
-
-            <!-- Bildbestätigungs-Dialog -->
-            <div class="photo-confirmation-dialog" id="photoConfirmationDialog">
-                <div class="dialog-content">
-                    <img id="confirmationImage" src="" alt="Confirmation image">
-                    <p>Ist dieses Bild in Ordnung?</p>
-                    <button id="confirmButton">Ja</button>
-                    <button id="retakeButton">Nein</button>
                 </div>
             </div>
             <button type="submit">Hinzufügen</button>
