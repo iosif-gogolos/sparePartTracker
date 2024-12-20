@@ -428,24 +428,26 @@
                 <option value="Nein" selected>Nein</option>
             </select>
 
-            <!-- Bilder hinzufügen -->
-            <label for="partImages">Bilder hochladen</label>
-            <input type="file" id="partImages" accept="image/*" multiple class="hidden">
-            <button type="button" id="uploadImagesButton" title="Bilder hochladen">
-                <span class="material-icons">camera_alt</span>
-            </button>
-            <div id="imagePreviewContainer"></div>
-
             <!-- Fotoguide -->
             <div class="photo-guide" id="photoGuide">
                 <h3>Fotoguide</h3>
                 <p id="photoGuideText">Foto 1: Bitte mach ein Foto vom Versandkarton</p>
-                <button type="button" id="startCameraButton">Kamera öffnen</button>
+                <button type="button" id="uploadImagesButton" title="Bilder hochladen">
+                    <span class="material-icons">camera_alt</span>
+                </button>
             </div>
 
             <input type="file" id="partImages" accept="image/*" capture="environment" multiple class="hidden">
             <div id="imagePreviewContainer"></div>
 
+
+            <!-- Bilder hinzufügen 
+            <label for="partImages">Bilder hochladen</label>
+            <input type="file" id="partImages" accept="image/*" multiple class="hidden">
+            <button type="button" id="uploadImagesButton" title="Bilder hochladen">
+                <span class="material-icons">camera_alt</span>
+            </button>
+            <div id="imagePreviewContainer"></div>-->
 
             <!-- Bildvorschau-Overlay -->
             <div class="image-preview-overlay" id="imagePreviewOverlay">
