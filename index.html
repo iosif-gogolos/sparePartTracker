@@ -429,7 +429,7 @@
             </select>
 
             <!-- Bilder hinzufügen -->
-            <label for="partImages">Bilder hochladen (max. 5)</label>
+            <label for="partImages">Bilder hochladen</label>
             <input type="file" id="partImages" accept="image/*" multiple class="hidden">
             <button type="button" id="uploadImagesButton" title="Bilder hochladen">
                 <span class="material-icons">camera_alt</span>
@@ -437,10 +437,15 @@
             <div id="imagePreviewContainer"></div>
 
             <!-- Fotoguide -->
-             <div class="photo-guide" id="photoGuide">
+            <div class="photo-guide" id="photoGuide">
                 <h3>Fotoguide</h3>
-                <p id="photoGuideText">Foto 1: Bitte mach ein Foto vom Versandkarton</p>"
-             </div>
+                <p id="photoGuideText">Foto 1: Bitte mach ein Foto vom Versandkarton</p>
+                <button type="button" id="startCameraButton">Kamera öffnen</button>
+            </div>
+
+            <input type="file" id="partImages" accept="image/*" capture="environment" multiple class="hidden">
+            <div id="imagePreviewContainer"></div>
+
 
             <!-- Bildvorschau-Overlay -->
             <div class="image-preview-overlay" id="imagePreviewOverlay">
@@ -496,15 +501,6 @@
             <button class="close-button" id="closePreviewButton">&times;</button>
             <img id="previewImage" src="" alt="Preview image">
 
-        </div>
-
-        <div class="photo-confirmation-dialog" id="photoConfirmationDialog">
-            <div class="dialog-content">
-                <img id="confirmationImage" src="" alt="Confirmation image">
-                <p>Ist dieses Bild in Ordnung?</p>
-                <button id="confirmButton">Ja</button>
-                <button id="retakeButton">Nein</button>
-            </div>
         </div>
 
         <table id="partsTable">
@@ -565,72 +561,157 @@
             const previewImage = document.getElementById('previewImage');
             const closePreviewButton = document.getElementById('closePreviewButton');
             const photoGuideText = document.getElementById('photoGuideText');
-        const confirmImageButton = document.getElementById('confirmImageButton');
-        const retakeImageButton = document.getElementById('retakeImageButton');
-        const photoGuideSteps = [
-            "Foto 1: Bitte mach ein Foto vom Versandkarton",
-            "Foto 2: Mache ein zweites Foto von Versandkarton",
-            "Foto 3: Mache ein Foto vom verpackten Ersatzteil (in der Regel in der Folie im Karton)",
-            "Foto 4: Mache ein zweites Foto vom verpackten Ersatzteil",
-            "Foto 5: Mache ein Foto von dem beschädigten Ersatzteil",
-            "Foto 6: Mache ein zweites Foto von dem beschädigten Ersatzteil",
-            "Foto 7: Mache ein drittes Foto von dem beschädigten Ersatzteil",
-            "Foto 8: Mache ein viertes Foto von dem beschädigten Ersatzteil"
-        ];
-        let currentStep = 0;
+            const startCameraButton = document.getElementById('startCameraButton');
+            const confirmImageButton = document.getElementById('confirmImageButton');
+            const retakeImageButton = document.getElementById('retakeImageButton');
+            const photoGuideSteps = [
+                "Foto 1: Bitte mach ein Foto vom Versandkarton",
+                "Foto 2: Mache ein zweites Foto von Versandkarton",
+                "Foto 3: Mache ein Foto vom verpackten Ersatzteil (in der Regel in der Folie im Karton)",
+                "Foto 4: Mache ein zweites Foto vom verpackten Ersatzteil",
+                "Foto 5: Mache ein Foto von dem beschädigten Ersatzteil",
+                "Foto 6: Mache ein zweites Foto von dem beschädigten Ersatzteil",
+                "Foto 7: Mache ein drittes Foto von dem beschädigten Ersatzteil",
+                "Foto 8: Mache ein viertes Foto von dem beschädigten Ersatzteil"
+            ];
+            let currentStep = 0;
+            let imageFiles = [];
 
-        uploadImagesButton.addEventListener('click', () => {
-            partImagesInput.click();
-        });
+            startCameraButton.addEventListener('click', () => {
+                partImagesInput.click();
+            });
 
-        partImagesInput.addEventListener('change', () => {
-            if (partImagesInput.files.length > 0) {
-                const file = partImagesInput.files[0];
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    previewImage.src = e.target.result;
-                    imagePreviewOverlay.style.display = 'flex';
+            partImagesInput.addEventListener('change', () => {
+                if (partImagesInput.files.length > 0) {
+                    const file = partImagesInput.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        previewImage.src = e.target.result;
+                        imagePreviewOverlay.style.display = 'flex';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            confirmImageButton.addEventListener('click', () => {
+                const img = document.createElement('div');
+                img.classList.add('image-preview');
+                img.innerHTML = `
+                    <img src="${previewImage.src}" alt="Preview">
+                    <button class="remove-button" data-index="${currentStep}">&times;</button>
+                `;
+                imagePreviewContainer.appendChild(img);
+                imageFiles.push(previewImage.src);
+                currentStep++;
+                if (currentStep < photoGuideSteps.length) {
+                    photoGuideText.textContent = photoGuideSteps[currentStep];
+                } else {
+                    photoGuideText.textContent = "Alle Fotos aufgenommen.";
+                }
+                imagePreviewOverlay.style.display = 'none';
+            });
+
+            retakeImageButton.addEventListener('click', () => {
+                partImagesInput.value = '';
+                imagePreviewOverlay.style.display = 'none';
+            });
+
+            closePreviewButton.addEventListener('click', () => {
+                imagePreviewOverlay.style.display = 'none';
+            });
+
+            imagePreviewContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-button')) {
+                    const index = e.target.getAttribute('data-index');
+                    imageFiles.splice(index, 1);
+                    e.target.parentElement.remove();
+                    currentStep--;
+                    photoGuideText.textContent = photoGuideSteps[currentStep];
+                }
+            });
+
+            addPartForm.addEventListener('submit', event => {
+                event.preventDefault();
+
+                const newPart = {
+                    id: Date.now(),
+                    licensePlate: document.getElementById('licensePlate').value,
+                    partNumber: document.getElementById('partNumber').value,
+                    description: document.getElementById('description').value,
+                    complaintDate: document.getElementById('complaintDate').value,
+                    reason: document.getElementById('reason').value,
+                    price: document.getElementById('price').value,
+                    remarks: document.getElementById('remarks').value,
+                    creditAvailable: document.getElementById('creditAvailable').value,
+                    images: imageFiles
                 };
-                reader.readAsDataURL(file);
-            }
-        });
 
-        confirmImageButton.addEventListener('click', () => {
-            const img = document.createElement('div');
-            img.classList.add('image-preview');
-            img.innerHTML = `
-                <img src="${previewImage.src}" alt="Preview">
-                <button class="remove-button" data-index="${currentStep}">&times;</button>
-            `;
-            imagePreviewContainer.appendChild(img);
-            imageFiles.push(previewImage.src);
-            currentStep++;
-            if (currentStep < photoGuideSteps.length) {
+                addPartToTable(newPart);
+                savePartToStorage(newPart);
+
+                addPartForm.reset();
+                imagePreviewContainer.innerHTML = '';
+                imageFiles = [];
+                currentStep = 0;
                 photoGuideText.textContent = photoGuideSteps[currentStep];
-            } else {
-                photoGuideText.textContent = "Alle Fotos aufgenommen.";
+            });
+
+            function addPartToTable(part) {
+                const newRow = document.createElement('tr');
+                newRow.dataset.id = part.id;
+                newRow.innerHTML = `
+                    <td>${part.licensePlate}</td>
+                    <td>${part.partNumber}</td>
+                    <td>${part.description}</td>
+                    <td>${part.complaintDate}</td>
+                    <td>${part.reason}</td>
+                    <td>${part.price}</td>
+                    <td>${part.remarks}</td>
+                    <td>${part.creditAvailable}</td>
+                    <td>
+                        <button class="icon-button delete-btn" title="Löschen">
+                            <span class="material-icons">delete</span>
+                        </button>
+                        <button class="icon-button view-images-btn" title="Bilder anzeigen">
+                            <span class="material-icons">photo</span>
+                        </button>
+                    </td>
+                `;
+                newRow.querySelector('.delete-btn').addEventListener('click', () => {
+                    if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`)) {
+                        removePartFromTable(part.id);
+                    }
+                });
+                newRow.querySelector('.view-images-btn').addEventListener('click', () => {
+                    viewImages(part.images);
+                });
+                partsTableBody.appendChild(newRow);
             }
-            imagePreviewOverlay.style.display = 'none';
-        });
 
-        retakeImageButton.addEventListener('click', () => {
-            partImagesInput.value = '';
-            imagePreviewOverlay.style.display = 'none';
-        });
-
-        closePreviewButton.addEventListener('click', () => {
-            imagePreviewOverlay.style.display = 'none';
-        });
-
-        imagePreviewContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('remove-button')) {
-                const index = e.target.getAttribute('data-index');
-                imageFiles.splice(index, 1);
-                e.target.parentElement.remove();
-                currentStep--;
-                photoGuideText.textContent = photoGuideSteps[currentStep];
+            function savePartToStorage(part) {
+                const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
+                storedParts.push(part);
+                localStorage.setItem('partsData', JSON.stringify(storedParts));
             }
-        });
+
+            function removePartFromTable(id) {
+                const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
+                const updatedParts = storedParts.filter(part => part.id !== id);
+                localStorage.setItem('partsData', JSON.stringify(updatedParts));
+                document.querySelector(`tr[data-id="${id}"]`).remove();
+            }
+
+            function viewImages(images) {
+                if (images.length > 0) {
+                    previewImage.src = images[0];
+                    imagePreviewOverlay.style.display = 'flex';
+                }
+            }
+
+            window.onload = () => {
+                const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
+                storedParts.forEach(part => addPartToTable(part));
+            };
 
             /*
 
