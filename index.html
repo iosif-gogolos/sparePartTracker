@@ -438,6 +438,15 @@
             <input type="file" id="partImages" accept="image/*" capture="environment" multiple class="hidden">
             <div id="imagePreviewContainer"></div>
 
+            <div class="photo-confirmation-dialog" id="photoConfirmationDialog">
+                <div class="dialog-content">
+                    <img id="confirmImageButton" src="" alt="Confirmation image">
+                    <p>Ist dieses Bild in Ordnung?</p>
+                    <button id="confirmButton">Ja</button>
+                    <button id="retakeButton">Nein</button>
+                </div>
+            </div>
+
 
             <!-- Bilder hinzufügen 
             <label for="partImages">Bilder hochladen</label>
@@ -716,11 +725,7 @@
                     }
                 }
 
-            const closeButton = imageModal.querySelector('.close-button');
-            closeButton.addEventListener('click', () => {
-                document.body.removeChild(imageModal);
-            });
-
+            
             /*
             partImagesInput.addEventListener('change', () => {
                 imagePreviewContainer.innerHTML = '';
