@@ -787,12 +787,20 @@
                         imagePreviewContainer.appendChild(img);
 
                         // Perform OCR on the image
-                        const orcText = await performOCR(e.target.result);
-                        console.log(`OCR Result for image ${index + 1}:`, orcText);
-                        const orcResultDiv = document.createElement('div');
-                        ocrResultDiv.classList.add(`ocr-result`);
-                        ocrResultDiv.textContent(`OCR Result: ${orcText}`);
-                        img.appendChild(orcResultDiv)
+                        const ocrText = await performOCR(e.target.result);
+                        console.log(`OCR Result for image ${index + 1}:`, ocrText);
+                        const ocrResultDiv = document.createElement('div');
+                        ocrResultDiv.classList.add('ocr-result');
+                        ocrResultDiv.textContent = `OCR Result: ${ocrText}`;
+                        img.appendChild(ocrResultDiv);
+
+                        // Update photo guide step
+                        if (currentStep < photoGuideSteps.length) {
+                            photoGuideText.textContent = photoGuideSteps[currentStep];
+                            currentStep++;
+                        } else {
+                            photoGuideText.textContent = "Alle Fotos aufgenommen.";
+                        }
                     };
                     reader.readAsDataURL(file);
                 });
