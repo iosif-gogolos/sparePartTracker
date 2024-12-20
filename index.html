@@ -588,6 +588,11 @@
             let storedParts = [];
             let filteredParts = [];
 
+            uploadImagesButton.addEventListener('click', () => {
+                partImagesInput.click();
+            });
+
+
             startCameraButton.addEventListener('click', () => {
                 partImagesInput.click();
             });
@@ -669,33 +674,44 @@
 
             function addPartToTable(part) {
                 const newRow = document.createElement('tr');
-                newRow.dataset.id = part.id;
-                newRow.innerHTML = `
-                    <td>${part.licensePlate}</td>
-                    <td>${part.partNumber}</td>
-                    <td>${part.description}</td>
-                    <td>${part.complaintDate}</td>
-                    <td>${part.reason}</td>
-                    <td>${part.price}</td>
-                    <td>${part.remarks}</td>
-                    <td>${part.creditAvailable}</td>
-                    <td>
-                        <button class="icon-button delete-btn" title="Löschen">
-                            <span class="material-icons">delete</span>
-                        </button>
-                        <button class="icon-button view-images-btn" title="Bilder anzeigen">
-                            <span class="material-icons">photo</span>
-                        </button>
-                    </td>
+                newRow.setAttribute('data-id', part.id);
+
+                for (const key in part) {
+                    if (key === 'id') continue;
+                    const cell = document.createElement('td');
+                    cell.textContent = key === 'complaintDate' && part[key]
+                        ? new Date(part[key]).toLocaleDateString('de-DE')
+                        : part[key];
+                    newRow.appendChild(cell);
+                }
+
+                const actionsCell = document.createElement('td');
+                actionsCell.innerHTML = `
+                    <button class="icon-button delete-btn" title="Löschen">
+                        <span class="material-icons">delete</span>
+                    </button>
+                    <button class="icon-button edit-btn" title="Bearbeiten">
+                        <span class="material-icons">edit</span>
+                    </button>
+                    <button class="icon-button view-images-btn" title="Bilder anzeigen">
+                        <span class="material-icons">photo</span>
+                    </button>
                 `;
-                newRow.querySelector('.delete-btn').addEventListener('click', () => {
-                    if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`)) {
+                actionsCell.querySelector('.delete-btn').addEventListener('click', () => {
+                    if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`))
                         removePartFromTable(part.id);
+                });
+                actionsCell.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
+                actionsCell.querySelector('.view-images-btn').addEventListener('click', () => {
+                    if (part.images.length === 0) {
+                        if (confirm("Es wurden noch keine Bilder hinzugefügt. Möchten Sie jetzt Bilder hinzufügen?")) {
+                            partImagesInput.click();
+                        }
+                    } else {
+                        viewImages(part.images);
                     }
                 });
-                newRow.querySelector('.view-images-btn').addEventListener('click', () => {
-                    viewImages(part.images);
-                });
+                newRow.appendChild(actionsCell);
                 partsTableBody.appendChild(newRow);
             }
 
@@ -713,11 +729,30 @@
             }
 
             function viewImages(images) {
-                if (images.length > 0) {
-                    previewImage.src = images[0];
-                    imagePreviewOverlay.style.display = 'flex';
-                }
+                const imageModal = document.createElement('div');
+                imageModal.classList.add('image-modal');
+                imageModal.innerHTML = `
+                    <div class="image-modal-content">
+                        <span class="close-button">&times;</span>
+                        <div class="image-gallery"></div>
+                    </div>
+                `;
+                document.body.appendChild(imageModal);
+
+                const imageGallery = imageModal.querySelector('.image-gallery');
+                images.forEach(src => {
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.classList.add('image-preview');
+                    imageGallery.appendChild(img);
+                });
+
+                const closeButton = imageModal.querySelector('.close-button');
+                closeButton.addEventListener('click', () => {
+                    document.body.removeChild(imageModal);
+                });
             }
+
 
             partImagesInput.addEventListener('change', () => {
                 imagePreviewContainer.innerHTML = '';
@@ -1145,7 +1180,7 @@
                     const headers = importedData[0];
                     importedData.slice(1).forEach((row, index) => {
                         const newPart = {
-                            id: Date.now() + index,
+                            id: uniqueId++,
                             licensePlate: row[headers.indexOf('licensePlate')] || `Unbekannt ${index}`,
                             partNumber: row[headers.indexOf('partNumber')] || "",
                             description: row[headers.indexOf('description')] || "",
@@ -1157,10 +1192,15 @@
                             images: []
                         };
 
-                        addPartToTable(newPart);
-                        savePartToStorage(newPart);
+                        storedParts.push(newPart);
                     });
 
+                    localStorage.setItem('partsData', JSON.stringify(storedParts));
+                    filteredParts = storedParts;
+                    renderTable();
+                    updateDashboard();
+                    exportButton.classList.remove('hidden');
+                    updateClearButtonVisibility();
                     alert("Import erfolgreich abgeschlossen!");
                 };
 
@@ -1183,8 +1223,9 @@
             }; */
 
             window.onload = () => {
-                const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
-                storedParts.forEach(part => addPartToTable(part));
+                loadPartsFromStorage();
+                updateDashboard();
+                updateClearButtonVisibility();
             };
     </script>
 </body>
