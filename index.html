@@ -428,7 +428,6 @@
             </select>
 
             <!-- Fotoguide -->
-        
             
              <div class="photo-guide" id="photoGuide">
                 <h3>Fotoguide</h3>
@@ -855,6 +854,94 @@
                 updateDashboard(); // Aktualisiere die Metriken und Handlungsempfehlungen
             }
 
+            // Speichern eines Ersatzteils vom Server
+            async function savePartToServer(part) {
+                try {
+                    const response = await fetch('/api/parts', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(part)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Fehler beim Speichern des Ersatzteils.');
+                    }
+
+                    const savedPart = await response.json();
+                    console.log('Saved part:', savedPart); // Log the saved part for debugging
+                    updateDashboard();
+                    updateClearButtonVisibility();
+                } catch (error) {
+                    console.error('Fehler beim Speichern des Ersatzteils:', error);
+                }
+            }
+            
+            // Laden eines Ersatzteils vom Server
+            async function loadPartsFromServer() {
+                try {
+                    console.log('Fetching parts from server...');
+                    const response = await fetch('/api/parts/spareParts.db');
+
+                    if (!response.ok) {
+                        throw new Error(`Fehler beim Laden der Ersatzteile. Status: ${response.status}`);
+                    }
+
+                    const parts = await response.json();
+                    console.log('Parts loaded from server:', parts);
+                    filteredParts = parts;
+                    renderTable();
+
+                    if (parts.length > 0) {
+                        exportButton.classList.remove('hidden');
+                    }
+                    updateClearButtonVisibility();
+                } catch (error) {
+                    console.error('Fehler beim Laden der Ersatzteile:', error);
+                }
+            }
+
+
+            // Löschen eines Ersatzteils vom Server
+            async function removePartFromServer(id) {
+                try {
+                    const response = await fetch(`/api/parts/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to delete part.');
+                    }
+
+                    document.querySelector(`tr[data-id="${id}"]`).remove();
+                    updateDashboard();
+                    updateClearButtonVisibility();
+                } catch (error) {
+                    console.error('Error deleting part from server:', error);
+                }
+            }
+
+            // Aktualisieren eines Ersatzteils vom Server
+            async function updatePartOnServer(updatedPart) {
+                try {
+                    const response = await fetch(`/api/parts/${updatedPart.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updatedPart)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to update part.');
+                    }
+
+                    const savedPart = await response.json();
+                    renderTable();
+                    updateDashboard();
+                    updateClearButtonVisibility();
+                } catch (error) {
+                    console.error('Error updating part on server:', error);
+                }
+            }
+
             function updateClearButtonVisibility() {
                 if (storedParts.length > 0) {
                     clearTableButton.classList.remove('hidden');
@@ -1096,7 +1183,8 @@
             });
 
             window.onload = () => {
-                loadPartsFromStorage();
+                //loadPartsFromStorage();
+                loadPartsFromServer();
                 updateDashboard();
                 updateClearButtonVisibility();
             }; 
