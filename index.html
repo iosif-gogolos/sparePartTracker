@@ -1008,6 +1008,9 @@
                     images: imageFiles // Assign the images array directly
                 };
 
+                console.log('Adding new part:', newPart); // Log the new part for debugging
+
+
                 if (isEditing) {
                     updatePartInStorage(newPart);
                     document.querySelector(`tr[data-id="${editingId}"]`)?.remove();
