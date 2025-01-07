@@ -619,7 +619,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         
                 // Ensure unique IDs for all parts
-                uniqueId = Math.max(...storedParts.map(part => part.id)) + 1;
+                if (storedParts.length > 0) {
+                    uniqueId = Math.max(...storedParts.map(part => part.id)) + 1;
+                } else {
+                    uniqueId = 1;
+                }
         
                 // Store the imported data in localStorage
                 localStorage.setItem('partsData', JSON.stringify(storedParts));
