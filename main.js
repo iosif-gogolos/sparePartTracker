@@ -613,6 +613,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         storedParts.push(newPart);
                     });
+                    uniqueId = Math.max(...storedParts.map(part => part.id)) + 1;
 
                     localStorage.setItem('partsData', JSON.stringify(storedParts));
                     filteredParts = storedParts;
