@@ -1,7 +1,5 @@
 // main.js
 
-import {saveDataToFile} from './git.js';
-
 document.addEventListener('DOMContentLoaded', function() {
     const addPartForm = document.getElementById('addPartForm');
             const partsTableBody = document.querySelector('#partsTable tbody');
@@ -187,8 +185,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateDashboard();
                 updateClearButtonVisibility();
 
-                // Save data to file and commit changes
-                //await saveDataToFile(storedParts, 'parts.json');
                 // Call renderImagePreviews to update the image previews
                 renderImagePreviews();
             });
