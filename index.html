@@ -575,49 +575,60 @@
                 files.forEach((file, index) => {
                     const reader = new FileReader();
                     reader.onload = (e) => {
-                        const img = document.createElement('div');
-                        img.classList.add('image-preview');
-                        img.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview">
-                            <button class="remove-button" data-index="${index}">&times;</button>
-                        `;
-                        imagePreviewContainer.appendChild(img);
-                        imageFiles.push(e.target.result);
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            const maxWidth = 800; // Set the maximum width
+                            const maxHeight = 600; // Set the maximum height
+                            let width = img.width;
+                            let height = img.height;
 
-                        // Update photo guide step
-                        currentStep ++;
-                        if (currentStep < photoGuideSteps.length) {
-                            photoGuideText.textContent = photoGuideSteps[currentStep];
-                        } else {
-                            photoGuideText.textContent = "Alle Fotos aufgenommen.";
-                        }
+                            // Calculate the new dimensions while maintaining the aspect ratio
+                            if (width > height) {
+                                if (width > maxWidth) {
+                                    height = Math.round((height *= maxWidth / width));
+                                    width = maxWidth;
+                                }
+                            } else {
+                                if (height > maxHeight) {
+                                    width = Math.round((width *= maxHeight / height));
+                                    height = maxHeight;
+                                }
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            canvas.toBlob((blob) => {
+                                const compressedReader = new FileReader();
+                                compressedReader.onload = (event) => {
+                                    const compressedImg = document.createElement('div');
+                                    compressedImg.classList.add('image-preview');
+                                    compressedImg.innerHTML = `
+                                        <img src="${event.target.result}" alt="Preview">
+                                        <button class="remove-button" data-index="${index}">&times;</button>
+                                    `;
+                                    imagePreviewContainer.appendChild(compressedImg);
+                                    imageFiles.push(event.target.result);
+
+                                    // Update photo guide step
+                                    currentStep++;
+                                    if (currentStep < photoGuideSteps.length) {
+                                        photoGuideText.textContent = photoGuideSteps[currentStep];
+                                    } else {
+                                        photoGuideText.textContent = "Alle Fotos aufgenommen.";
+                                    }
+                                };
+                                compressedReader.readAsDataURL(blob);
+                            }, 'image/jpeg', 0.7); // Adjust the quality as needed
+                        };
+                        img.src = e.target.result;
                     };
                     reader.readAsDataURL(file);
                 });
             });
-
-            retakeImageButton.addEventListener('click', () => {
-                partImagesInput.value = '';
-                imagePreviewOverlay.style.display = 'none';
-            });
-            
-            closePreviewButton.addEventListener('click', () => {
-                imagePreviewOverlay.style.display = 'none';
-            });
-
-
-            function savePartToStorage(part) {
-                const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
-                storedParts.push(part);
-                localStorage.setItem('partsData', JSON.stringify(storedParts));
-            }
-
-            function removePartFromTable(id) {
-                const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
-                const updatedParts = storedParts.filter(part => part.id !== id);
-                localStorage.setItem('partsData', JSON.stringify(updatedParts));
-                document.querySelector(`tr[data-id="${id}"]`).remove();
-            }
 
             confirmImageButton.addEventListener('click', () => {
                 const img = document.createElement('div');
@@ -637,6 +648,15 @@
                 imagePreviewOverlay.style.display = 'none';
             });
 
+            retakeImageButton.addEventListener('click', () => {
+                partImagesInput.value = '';
+                imagePreviewOverlay.style.display = 'none';
+            });
+            
+            closePreviewButton.addEventListener('click', () => {
+                imagePreviewOverlay.style.display = 'none';
+            });
+
             imagePreviewContainer.addEventListener('click', (e) => {
                 if (e.target.classList.contains('remove-button')) {
                     const index = e.target.getAttribute('data-index');
@@ -651,41 +671,46 @@
                 }
             });
 
-            function renderImagePreviews() {
+            addPartForm.addEventListener('submit', event => {
+                event.preventDefault();
+
+                const newPart = {
+                    id: isEditing ? editingId : uniqueId++,
+                    licensePlate: document.getElementById('licensePlate').value,
+                    partNumber: document.getElementById('partNumber').value,
+                    description: document.getElementById('description').value,
+                    complaintDate: document.getElementById('complaintDate').value,
+                    reason: document.getElementById('reason').value,
+                    price: document.getElementById('price').value,
+                    remarks: document.getElementById('remarks').value,
+                    creditAvailable: document.getElementById('creditAvailable').value,
+                    images: imageFiles // Assign the images array directly
+                };
+
+                console.log('Adding new part:', newPart); // Log the new part for debugging
+
+
+                if (isEditing) {
+                    updatePartInStorage(newPart);
+                    document.querySelector(`tr[data-id="${editingId}"]`)?.remove();
+                    addPartToTable(newPart);
+                    isEditing = false;
+                    editingId = null;
+                    addButton.textContent = 'Hinzufügen';
+                } else {
+                    addPartToTable(newPart);
+                    savePartToStorage(newPart);
+                }
+
+                exportButton.classList.remove('hidden');
+                addPartForm.reset();
                 imagePreviewContainer.innerHTML = '';
-                imageFiles.forEach((file, index) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = document.createElement('div');
-                        img.classList.add('image-preview');
-                        img.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview">
-                            <button class="remove-button" data-index="${index}">&times;</button>
-                        `;
-                        imagePreviewContainer.appendChild(img);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
-            
-            function loadPartsFromStorage() {
-                storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
-                filteredParts = storedParts;
-                renderTable();
-                if (storedParts.length > 0) exportButton.classList.remove('hidden');
+                imageFiles = [];
+                currentStep = 0;
+                photoGuideText.textContent = photoGuideSteps[currentStep];
+                updateDashboard();
                 updateClearButtonVisibility();
-            }
-
-            function renderTable() {
-                console.log('Rendering table...');
-                partsTableBody.innerHTML = '';
-                const start = (currentPage - 1) * entriesPerPage;
-                const end = start + entriesPerPage;
-                const partsToDisplay = filteredParts.slice(start, end);
-
-                partsToDisplay.forEach(addPartToTable);
-                updatePaginationButtons();
-            }
+            });
 
             function addPartToTable(part) {
                 const newRow = document.createElement('tr');
@@ -727,6 +752,55 @@
                     }
                 });
                 partsTableBody.appendChild(newRow);
+            }
+
+            function savePartToStorage(part) {
+                const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
+                storedParts.push(part);
+                localStorage.setItem('partsData', JSON.stringify(storedParts));
+            }
+
+            function removePartFromTable(id) {
+                const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
+                const updatedParts = storedParts.filter(part => part.id !== id);
+                localStorage.setItem('partsData', JSON.stringify(updatedParts));
+                document.querySelector(`tr[data-id="${id}"]`).remove();
+            }
+
+            function renderImagePreviews() {
+                imagePreviewContainer.innerHTML = '';
+                imageFiles.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.createElement('div');
+                        img.classList.add('image-preview');
+                        img.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview">
+                            <button class="remove-button" data-index="${index}">&times;</button>
+                        `;
+                        imagePreviewContainer.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            
+            function loadPartsFromStorage() {
+                storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
+                filteredParts = storedParts;
+                renderTable();
+                if (storedParts.length > 0) exportButton.classList.remove('hidden');
+                updateClearButtonVisibility();
+            }
+
+            function renderTable() {
+                console.log('Rendering table...');
+                partsTableBody.innerHTML = '';
+                const start = (currentPage - 1) * entriesPerPage;
+                const end = start + entriesPerPage;
+                const partsToDisplay = filteredParts.slice(start, end);
+
+                partsToDisplay.forEach(addPartToTable);
+                updatePaginationButtons();
             }
 
             function viewImages(images) {
@@ -990,47 +1064,6 @@
                 currentPage = 1;
                 renderTable();
                 clearSearchButton.classList.add('hidden');
-            });
-
-            addPartForm.addEventListener('submit', event => {
-                event.preventDefault();
-
-                const newPart = {
-                    id: isEditing ? editingId : uniqueId++,
-                    licensePlate: document.getElementById('licensePlate').value,
-                    partNumber: document.getElementById('partNumber').value,
-                    description: document.getElementById('description').value,
-                    complaintDate: document.getElementById('complaintDate').value,
-                    reason: document.getElementById('reason').value,
-                    price: document.getElementById('price').value,
-                    remarks: document.getElementById('remarks').value,
-                    creditAvailable: document.getElementById('creditAvailable').value,
-                    images: imageFiles // Assign the images array directly
-                };
-
-                console.log('Adding new part:', newPart); // Log the new part for debugging
-
-
-                if (isEditing) {
-                    updatePartInStorage(newPart);
-                    document.querySelector(`tr[data-id="${editingId}"]`)?.remove();
-                    addPartToTable(newPart);
-                    isEditing = false;
-                    editingId = null;
-                    addButton.textContent = 'Hinzufügen';
-                } else {
-                    addPartToTable(newPart);
-                    savePartToStorage(newPart);
-                }
-
-                exportButton.classList.remove('hidden');
-                addPartForm.reset();
-                imagePreviewContainer.innerHTML = '';
-                imageFiles = [];
-                currentStep = 0;
-                photoGuideText.textContent = photoGuideSteps[currentStep];
-                updateDashboard();
-                updateClearButtonVisibility();
             });
 
             exportButton.addEventListener('click', () => {
