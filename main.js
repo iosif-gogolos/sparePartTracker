@@ -1,9 +1,6 @@
 // main.js
 
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
+import {saveDataToFile} from './git.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     const addPartForm = document.getElementById('addPartForm');
@@ -169,7 +166,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 console.log('Adding new part:', newPart); // Log the new part for debugging
 
-
                 if (isEditing) {
                     updatePartInStorage(newPart);
                     document.querySelector(`tr[data-id="${editingId}"]`)?.remove();
@@ -190,6 +186,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 photoGuideText.textContent = photoGuideSteps[currentStep];
                 updateDashboard();
                 updateClearButtonVisibility();
+
+                // Save data to file and commit changes
+                //await saveDataToFile(storedParts, 'parts.json');
+                // Call renderImagePreviews to update the image previews
+                renderImagePreviews();
             });
 
             function addPartToTable(part) {
@@ -238,13 +239,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
                 storedParts.push(part);
                 localStorage.setItem('partsData', JSON.stringify(storedParts));
-            }
-
-            function removePartFromTable(id) {
-                const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
-                const updatedParts = storedParts.filter(part => part.id !== id);
-                localStorage.setItem('partsData', JSON.stringify(updatedParts));
-                document.querySelector(`tr[data-id="${id}"]`).remove();
             }
 
             function renderImagePreviews() {
