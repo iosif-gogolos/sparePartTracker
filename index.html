@@ -588,7 +588,6 @@
                         currentStep ++;
                         if (currentStep < photoGuideSteps.length) {
                             photoGuideText.textContent = photoGuideSteps[currentStep];
-                            currentStep++;
                         } else {
                             photoGuideText.textContent = "Alle Fotos aufgenommen.";
                         }
@@ -690,37 +689,36 @@
 
             function addPartToTable(part) {
                 const newRow = document.createElement('tr');
-                newRow.setAttribute('data-id', part.id);
-                
-                for (const key in part) {
-                    if (key === 'id' || key === 'images') continue;
-                    const cell = document.createElement('td');
-                    cell.textContent = key === 'complaintDate' && part[key]
-                        ? new Date(part[key]).toLocaleDateString('de-DE')
-                        : part[key];
-                    newRow.appendChild(cell);
-                }
-
-                const actionsCell = document.createElement('td');
-                actionsCell.innerHTML = `
-                    <button class="icon-button delete-btn" title="Löschen">
-                        <span class="material-icons">delete</span>
-                    </button>
-                    <button class="icon-button edit-btn" title="Bearbeiten">
-                        <span class="material-icons">edit</span>
-                    </button>
-                    <button class="icon-button view-images-btn" title="Bilder anzeigen">
-                        <span class="material-icons">photo</span>
-                    </button>
+                newRow.dataset.id = part.id;
+                newRow.innerHTML = `
+                    <td>${part.licensePlate}</td>
+                    <td>${part.partNumber}</td>
+                    <td>${part.description}</td>
+                    <td>${part.complaintDate}</td>
+                    <td>${part.reason}</td>
+                    <td>${part.price}</td>
+                    <td>${part.remarks}</td>
+                    <td>${part.creditAvailable}</td>
+                    <td>
+                        <button class="icon-button delete-btn" title="Löschen">
+                            <span class="material-icons">delete</span>
+                        </button>
+                        <button class="icon-button edit-btn" title="Bearbeiten">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button class="icon-button view-images-btn" title="Bilder anzeigen">
+                            <span class="material-icons">photo</span>
+                        </button>
+                    </td>
                 `;
-                actionsCell.querySelector('.delete-btn').addEventListener('click', () => {
-                    if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`))
+                newRow.querySelector('.delete-btn').addEventListener('click', () => {
+                    if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`)) {
                         removePartFromTable(part.id);
-                }); 
-
-                actionsCell.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
-                actionsCell.querySelector('.view-images-btn').addEventListener('click', () => {
-                    if (part.images.length === 0) {
+                    }
+                });
+                newRow.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
+                newRow.querySelector('.view-images-btn').addEventListener('click', () => {
+                    if (!part.images || part.images.length === 0) {
                         if (confirm("Es wurden noch keine Bilder hinzugefügt. Möchten Sie jetzt Bilder hinzufügen?")) {
                             partImagesInput.click();
                         }
@@ -728,7 +726,6 @@
                         viewImages(part.images);
                     }
                 });
-                newRow.appendChild(actionsCell);
                 partsTableBody.appendChild(newRow);
             }
 
