@@ -547,8 +547,8 @@
             const confirmImageButton = document.getElementById('confirmImageButton');
             const retakeImageButton = document.getElementById('retakeImageButton');
             const photoGuideSteps = [
-                "Foto 1: Bitte mach ein Foto vom Versandkarton",
-                "Foto 2: Mache ein zweites Foto von Versandkarton (z.B. vom Versandetikett)",
+                "Foto 1: Bitte mach ein Foto von dem Versandkarton",
+                "Foto 2: Mache ein zweites Foto von dem Versandkarton (z.B. vom Versandetikett)",
                 "Foto 3: Mache ein Foto vom verpackten Ersatzteil (in der Regel in der Folie im Karton)",
                 "Foto 4: Mache ein zweites Foto vom verpackten Ersatzteil",
                 "Foto 5: Mache ein Foto von dem beschädigten Ersatzteil",
@@ -569,10 +569,6 @@
             uploadImagesButton.addEventListener('click', () => {
                 partImagesInput.click();
             });
-            /*
-            startCameraButton.addEventListener('click', () => {
-                partImagesInput.click();
-            });*/
 
             partImagesInput.addEventListener('change', () => {
                 const files = Array.from(partImagesInput.files);
@@ -589,6 +585,7 @@
                         imageFiles.push(e.target.result);
 
                         // Update photo guide step
+                        currentStep ++;
                         if (currentStep < photoGuideSteps.length) {
                             photoGuideText.textContent = photoGuideSteps[currentStep];
                             currentStep++;
@@ -604,8 +601,6 @@
                 partImagesInput.value = '';
                 imagePreviewOverlay.style.display = 'none';
             });
-
-
             
             closePreviewButton.addEventListener('click', () => {
                 imagePreviewOverlay.style.display = 'none';
