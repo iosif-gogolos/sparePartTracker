@@ -406,11 +406,11 @@
             <input type="text" id="licensePlate" placeholder="Kennzeichen" required>
             <label for="partNumber">Teilenummer</label>
             <input type="text" id="partNumber" placeholder="Teilenummer" required>
-            <label for="description">Name des Artikels</label>
-            <input type="text" id="description" placeholder="Beschreibung">
+            <label for="description">Teil</label>
+            <input type="text" id="description" placeholder="Teil">
             <label for="complaintDate">Reklamationsdatum</label>
             <input type="date" id="complaintDate" required>
-            <label for="reason">Grund</label>
+            <label for="reason">Reklamationsgrund</label>
             <select id="reason">
                 <option value="Beschädigt">Beschädigt</option>
                 <option value="Falsch geliefert">Falsch geliefert</option>
@@ -487,9 +487,9 @@
                 <tr>
                     <th>Kennzeichen</th>
                     <th>Teilenummer</th>
-                    <th>Beschreibung</th>
+                    <th>Teil</th>
                     <th>Reklamationsdatum</th>
-                    <th>Grund</th>
+                    <th>Reklamationsgrund</th>
                     <th>Preis</th>
                     <th>Bemerkung</th>
                     <th>Gutschrift vorhanden</th>
@@ -753,7 +753,7 @@
                 newRow.appendChild(actionsCell);
                 partsTableBody.appendChild(newRow);
             }
-            
+
             function viewImages(images) {
                 const imageModal = document.createElement('div');
                 imageModal.classList.add('image-modal');
