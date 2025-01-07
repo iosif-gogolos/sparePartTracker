@@ -576,8 +576,8 @@
             });*/
 
             partImagesInput.addEventListener('change', () => {
-                imagePreviewContainer.innerHTML = '';
-                imageFiles = Array.from(partImagesInput.files);
+                imagePreviewContainer.innerHTML = '';  // Leere den Container, um die aktuelle Vorschau neu zu rendern
+                imageFiles = Array.from(partImagesInput.files);  // Füge neue Dateien zur Liste hinzu
                 if (imageFiles.length > 9) {
                     alert("Sie können maximal 9 Bilder hochladen.");
                     partImagesInput.value = '';
@@ -599,17 +599,17 @@
                         const ocrText = await performOCR(e.target.result);
                         console.log(`OCR Result for image ${index + 1}:`, ocrText);
                         displayOCRResults(ocrText);
-
-                        // Update photo guide step
-                        if (currentStep < photoGuideSteps.length) {
-                            photoGuideText.textContent = photoGuideSteps[currentStep];
-                            currentStep++;
-                        } else {
-                            photoGuideText.textContent = "Alle Fotos aufgenommen.";
-                        }
                     };
                     reader.readAsDataURL(file);
                 });
+
+                // Update photo guide step outside the forEach loop
+                if (currentStep < photoGuideSteps.length) {
+                    photoGuideText.textContent = photoGuideSteps[currentStep];
+                    currentStep++;
+                } else {
+                    photoGuideText.textContent = "Alle Fotos aufgenommen.";
+                }
             });
 
             retakeImageButton.addEventListener('click', () => {
@@ -655,39 +655,34 @@
 
             imagePreviewContainer.addEventListener('click', (e) => {
                 if (e.target.classList.contains('remove-button')) {
-                    const index = e.target.getAttribute('data-index');
+                    const index = parseInt(e.target.getAttribute('data-index'), 10);
                     imageFiles.splice(index, 1);
-                    partImagesInput.value = '';
-                    currentStep--;
+                    partImagesInput.value = '';  // Reset input to allow re-uploading
+                    currentStep = Math.max(0, currentStep - 1);  // Decrease step safely
                     if (currentStep < photoGuideSteps.length) {
                         photoGuideText.textContent = photoGuideSteps[currentStep];
                     } else {
                         photoGuideText.textContent = "Alle Fotos aufgenommen.";
                     }
-                    imagePreviewContainer.innerHTML = '';
-                    imageFiles.forEach((file, index) => {
-                        const reader = new FileReader();
-                        reader.onload = async (e) => {
-                            const img = document.createElement('div');
-                            img.classList.add('image-preview');
-                            img.innerHTML = `
-                                <img src="${e.target.result}" alt="Preview">
-                                <button class="remove-button" data-index="${index}">&times;</button>
-                            `;
-                            imagePreviewContainer.appendChild(img);
-
-                            // Perform OCR on the image
-                            const orcText = await performOCR(e.target.result);
-                            console.log(`OCR Result for image ${index + 1}:`, orcText);
-                            const orcResultDiv = document.createElement('div');
-                            ocrResultDiv.classlist.add('ocr-result');
-                            ocrResultDiv.textContent(`OCR Result: ${orcText}`);
-                            img.appendChild(orcResultDiv);
-                        };
-                        reader.readAsDataURL(file);
-                    });
+                    renderImagePreviews();  // Re-render image previews
                 }
             });
+
+            function renderImagePreviews() {
+                imagePreviewContainer.innerHTML = '';
+                imageFiles.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.createElement('div');
+                        img.classList.add('image-preview');
+                        img.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview">
+                            <button class="remove-button" data-index="${index}">&times;</button>
+                        `;
+                        imagePreviewContainer.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
 
 
             function loadPartsFromStorage() {
@@ -880,7 +875,7 @@
             async function loadPartsFromServer() {
                 try {
                     console.log('Fetching parts from server...');
-                    const response = await fetch('/api/parts/spareParts.db');
+                    const response = await fetch('/api/parts/');
 
                     if (!response.ok) {
                         throw new Error(`Fehler beim Laden der Ersatzteile. Status: ${response.status}`);
@@ -1183,8 +1178,8 @@
             });
 
             window.onload = () => {
-                //loadPartsFromStorage();
-                loadPartsFromServer();
+                loadPartsFromStorage();
+                //loadPartsFromServer();
                 updateDashboard();
                 updateClearButtonVisibility();
             }; 
