@@ -213,12 +213,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     </button>
                 </td>
             `;
+        
             newRow.querySelector('.delete-btn').addEventListener('click', () => {
                 if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`)) {
                     removePartFromTable(part.id);
                 }
             });
+        
             newRow.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
+        
             newRow.querySelector('.view-images-btn').addEventListener('click', () => {
                 if (!part.images || part.images.length === 0) {
                     if (confirm("Es wurden noch keine Bilder hinzugefügt. Möchten Sie jetzt Bilder hinzufügen?")) {
@@ -228,6 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     viewImages(part.images);
                 }
             });
+        
             partsTableBody.appendChild(newRow);
         }
 
@@ -268,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const start = (currentPage - 1) * entriesPerPage;
             const end = start + entriesPerPage;
             const partsToDisplay = filteredParts.slice(start, end);
-
+        
             partsToDisplay.forEach(addPartToTable);
             updatePaginationButtons();
         }
@@ -579,23 +583,23 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('importButton').addEventListener('click', () => {
             const fileInput = document.getElementById('importFile');
             const file = fileInput.files[0];
-
+        
             if (!file) {
                 alert("Bitte wählen Sie eine Datei aus.");
                 return;
             }
-
+        
             const reader = new FileReader();
-
+        
             reader.onload = (event) => {
                 const data = new Uint8Array(event.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
-
+        
                 const sheetName = workbook.SheetNames[0];
                 const sheet = workbook.Sheets[sheetName];
-
+        
                 const importedData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
+        
                 const headers = importedData[0];
                 importedData.slice(1).forEach((row, index) => {
                     const newPart = {
@@ -610,24 +614,29 @@ document.addEventListener('DOMContentLoaded', function() {
                         creditAvailable: row[headers.indexOf('creditAvailable')] || "Nein",
                         images: []
                     };
-
+        
                     storedParts.push(newPart);
                 });
+        
+                // Ensure unique IDs for all parts
                 uniqueId = Math.max(...storedParts.map(part => part.id)) + 1;
-
+        
+                // Store the imported data in localStorage
                 localStorage.setItem('partsData', JSON.stringify(storedParts));
                 filteredParts = storedParts;
+        
+                // Render the table with the imported data
                 renderTable();
                 updateDashboard();
                 exportButton.classList.remove('hidden');
                 updateClearButtonVisibility();
                 alert("Import erfolgreich abgeschlossen!");
             };
-
+        
             reader.onerror = (error) => {
                 alert("Fehler beim Lesen der Datei: " + error.message);
             };
-
+        
             if (file.name.endsWith('.csv')) {
                 reader.readAsText(file);
             } else {
