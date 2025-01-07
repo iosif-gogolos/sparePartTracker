@@ -683,8 +683,8 @@
                     };
                     reader.readAsDataURL(file);
                 });
-
-
+            }
+            
             function loadPartsFromStorage() {
                 storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
                 filteredParts = storedParts;
