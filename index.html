@@ -544,7 +544,6 @@
             const previewImage = document.getElementById('previewImage');
             const closePreviewButton = document.getElementById('closePreviewButton');
             const photoGuideText = document.getElementById('photoGuideText');
-            //const startCameraButton = document.getElementById('startCameraButton');
             const confirmImageButton = document.getElementById('confirmImageButton');
             const retakeImageButton = document.getElementById('retakeImageButton');
             const photoGuideSteps = [
@@ -576,17 +575,10 @@
             });*/
 
             partImagesInput.addEventListener('change', () => {
-                imagePreviewContainer.innerHTML = '';  // Leere den Container, um die aktuelle Vorschau neu zu rendern
-                imageFiles = Array.from(partImagesInput.files);  // Füge neue Dateien zur Liste hinzu
-                if (imageFiles.length > 9) {
-                    alert("Sie können maximal 9 Bilder hochladen.");
-                    partImagesInput.value = '';
-                    imageFiles = [];
-                    return;
-                }
-                imageFiles.forEach((file, index) => {
+                const files = Array.from(partImagesInput.files);
+                files.forEach((file, index) => {
                     const reader = new FileReader();
-                    reader.onload = async (e) => {
+                    reader.onload = (e) => {
                         const img = document.createElement('div');
                         img.classList.add('image-preview');
                         img.innerHTML = `
@@ -594,22 +586,18 @@
                             <button class="remove-button" data-index="${index}">&times;</button>
                         `;
                         imagePreviewContainer.appendChild(img);
+                        imageFiles.push(e.target.result);
 
-                        // Perform OCR on the image
-                        const ocrText = await performOCR(e.target.result);
-                        console.log(`OCR Result for image ${index + 1}:`, ocrText);
-                        displayOCRResults(ocrText);
+                        // Update photo guide step
+                        if (currentStep < photoGuideSteps.length) {
+                            photoGuideText.textContent = photoGuideSteps[currentStep];
+                            currentStep++;
+                        } else {
+                            photoGuideText.textContent = "Alle Fotos aufgenommen.";
+                        }
                     };
                     reader.readAsDataURL(file);
                 });
-
-                // Update photo guide step outside the forEach loop
-                if (currentStep < photoGuideSteps.length) {
-                    photoGuideText.textContent = photoGuideSteps[currentStep];
-                    currentStep++;
-                } else {
-                    photoGuideText.textContent = "Alle Fotos aufgenommen.";
-                }
             });
 
             retakeImageButton.addEventListener('click', () => {
@@ -617,9 +605,11 @@
                 imagePreviewOverlay.style.display = 'none';
             });
 
+
+            
             closePreviewButton.addEventListener('click', () => {
                 imagePreviewOverlay.style.display = 'none';
-            }); 
+            });
 
 
             function savePartToStorage(part) {
@@ -655,16 +645,15 @@
 
             imagePreviewContainer.addEventListener('click', (e) => {
                 if (e.target.classList.contains('remove-button')) {
-                    const index = parseInt(e.target.getAttribute('data-index'), 10);
+                    const index = e.target.getAttribute('data-index');
                     imageFiles.splice(index, 1);
-                    partImagesInput.value = '';  // Reset input to allow re-uploading
-                    currentStep = Math.max(0, currentStep - 1);  // Decrease step safely
+                    e.target.parentElement.remove();
+                    currentStep--;
                     if (currentStep < photoGuideSteps.length) {
                         photoGuideText.textContent = photoGuideSteps[currentStep];
                     } else {
                         photoGuideText.textContent = "Alle Fotos aufgenommen.";
                     }
-                    renderImagePreviews();  // Re-render image previews
                 }
             });
 
@@ -706,37 +695,36 @@
 
             function addPartToTable(part) {
                 const newRow = document.createElement('tr');
-                newRow.setAttribute('data-id', part.id);
-                
-                for (const key in part) {
-                    if (key === 'id' || key === 'images') continue;
-                    const cell = document.createElement('td');
-                    cell.textContent = key === 'complaintDate' && part[key]
-                        ? new Date(part[key]).toLocaleDateString('de-DE')
-                        : part[key];
-                    newRow.appendChild(cell);
-                }
-
-                const actionsCell = document.createElement('td');
-                actionsCell.innerHTML = `
-                    <button class="icon-button delete-btn" title="Löschen">
-                        <span class="material-icons">delete</span>
-                    </button>
-                    <button class="icon-button edit-btn" title="Bearbeiten">
-                        <span class="material-icons">edit</span>
-                    </button>
-                    <button class="icon-button view-images-btn" title="Bilder anzeigen">
-                        <span class="material-icons">photo</span>
-                    </button>
+                newRow.dataset.id = part.id;
+                newRow.innerHTML = `
+                    <td>${part.licensePlate}</td>
+                    <td>${part.partNumber}</td>
+                    <td>${part.description}</td>
+                    <td>${part.complaintDate}</td>
+                    <td>${part.reason}</td>
+                    <td>${part.price}</td>
+                    <td>${part.remarks}</td>
+                    <td>${part.creditAvailable}</td>
+                    <td>
+                        <button class="icon-button delete-btn" title="Löschen">
+                            <span class="material-icons">delete</span>
+                        </button>
+                        <button class="icon-button edit-btn" title="Bearbeiten">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button class="icon-button view-images-btn" title="Bilder anzeigen">
+                            <span class="material-icons">photo</span>
+                        </button>
+                    </td>
                 `;
-                actionsCell.querySelector('.delete-btn').addEventListener('click', () => {
-                    if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`))
+                newRow.querySelector('.delete-btn').addEventListener('click', () => {
+                    if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`)) {
                         removePartFromTable(part.id);
-                }); 
-
-                actionsCell.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
-                actionsCell.querySelector('.view-images-btn').addEventListener('click', () => {
-                    if (part.images.length === 0) {
+                    }
+                });
+                newRow.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
+                newRow.querySelector('.view-images-btn').addEventListener('click', () => {
+                    if (!part.images || part.images.length === 0) {
                         if (confirm("Es wurden noch keine Bilder hinzugefügt. Möchten Sie jetzt Bilder hinzufügen?")) {
                             partImagesInput.click();
                         }
@@ -744,7 +732,6 @@
                         viewImages(part.images);
                     }
                 });
-                newRow.appendChild(actionsCell);
                 partsTableBody.appendChild(newRow);
             }
 
@@ -771,7 +758,7 @@
                 closeButton.addEventListener('click', () => {
                     document.body.removeChild(imageModal);
                 });
-            } 
+            }
 
 
             // OCR Erkennung
@@ -1013,6 +1000,7 @@
 
             addPartForm.addEventListener('submit', event => {
                 event.preventDefault();
+
                 const newPart = {
                     id: isEditing ? editingId : uniqueId++,
                     licensePlate: document.getElementById('licensePlate').value,
@@ -1023,60 +1011,29 @@
                     price: document.getElementById('price').value,
                     remarks: document.getElementById('remarks').value,
                     creditAvailable: document.getElementById('creditAvailable').value,
-                    images: [] // Initialize images as an empty array
+                    images: imageFiles // Assign the images array directly
                 };
 
-                const readerPromises = [];
-                imageFiles.forEach((file, index) => {
-                    const reader = new FileReader();
-                    readerPromises.push(new Promise((resolve, reject) => {
-                        reader.onload = (e) => {
-                            const img = new Image();
-                            img.src = e.target.result;
-                            img.onload = () => {
-                                const canvas = document.createElement('canvas');
-                                const ctx = canvas.getContext('2d');
-                                canvas.width = img.width;
-                                canvas.height = img.height;
-                                ctx.drawImage(img, 0, 0);
-                                canvas.toBlob((blob) => {
-                                    const webpReader = new FileReader();
-                                    webpReader.onload = (webpEvent) => {
-                                        newPart.images.push(webpEvent.target.result);
-                                        resolve();
-                                    };
-                                    webpReader.onerror = reject;
-                                    webpReader.readAsDataURL(blob);
-                                }, 'image/webp');
-                            };
-                        };
-                        reader.onerror = reject;
-                        reader.readAsDataURL(file);
-                    }));
-                });
+                if (isEditing) {
+                    updatePartInStorage(newPart);
+                    document.querySelector(`tr[data-id="${editingId}"]`)?.remove();
+                    addPartToTable(newPart);
+                    isEditing = false;
+                    editingId = null;
+                    addButton.textContent = 'Hinzufügen';
+                } else {
+                    addPartToTable(newPart);
+                    savePartToStorage(newPart);
+                }
 
-                Promise.all(readerPromises).then(() => {
-                    if (isEditing) {
-                        updatePartInStorage(newPart);
-                        document.querySelector(`tr[data-id="${editingId}"]`)?.remove();
-                        addPartToTable(newPart);
-                        isEditing = false;
-                        editingId = null;
-                        addButton.textContent = 'Hinzufügen';
-                    } else {
-                        addPartToTable(newPart);
-                        savePartToStorage(newPart);
-                    }
-
-                    exportButton.classList.remove('hidden');
-                    addPartForm.reset();
-                    imagePreviewContainer.innerHTML = '';
-                    imageFiles = [];
-                    updateDashboard();
-                    updateClearButtonVisibility();
-                }).catch(error => {
-                    console.error("Fehler beim Lesen der Bilder:", error);
-                });
+                exportButton.classList.remove('hidden');
+                addPartForm.reset();
+                imagePreviewContainer.innerHTML = '';
+                imageFiles = [];
+                currentStep = 0;
+                photoGuideText.textContent = photoGuideSteps[currentStep];
+                updateDashboard();
+                updateClearButtonVisibility();
             });
 
             exportButton.addEventListener('click', () => {
