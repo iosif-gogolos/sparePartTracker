@@ -479,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('notReturnedCount').textContent = notReturnedCount;
         document.getElementById('totalPrice').textContent = `${totalPrice.toFixed(2)} €`;
         document.getElementById('returnedCount').textContent = returnedCount;
-        //document.getElementById('returnedPrice').textContent = `${returnedPrice.toFixed(2)} €`;
+        document.getElementById('returnedPrice').textContent = `${returnedPrice.toFixed(2)} €`;
         //document.getElementById('openAmount').textContent = `${openAmount.toFixed(2)} €`;
 
         const recommendationText = document.getElementById('recommendationText');
