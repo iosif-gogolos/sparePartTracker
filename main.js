@@ -472,10 +472,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 return filteredData;
             });
         
-            // Exportiere die Liste als CSV
+            // Exportiere die Liste als XLSX
             const worksheet = XLSX.utils.json_to_sheet(dataWithoutImages);
-            const csv = XLSX.utils.sheet_to_csv(worksheet);
-            mainFolder.file('Liste.csv', csv);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Liste');
+            const xlsxData = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            mainFolder.file('Liste.xlsx', xlsxData);
         
             // Füge die Bilder hinzu
             storedParts.forEach(part => {
