@@ -547,7 +547,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const imagesFolder = mainFolder.folder('Bilder');
         
             // Erstellen einer Kopie der Daten ohne die `images`-Eigenschaft und ohne leere `id`-Eigenschaft
-            const dataWithoutImages = storedParts.map(({ images, id, ...rest }) => rest);
+            const dataWithoutImages = storedParts.map(({ images, id, ...rest }) => {
+                // Filtere die `id`-Eigenschaft nur ein, wenn sie nicht leer ist
+                let filteredData = { ...rest };
+                if (id) {
+                    filteredData.id = id;
+                }
+                return filteredData;
+            });
         
             // Exportiere die Liste als CSV
             const worksheet = XLSX.utils.json_to_sheet(dataWithoutImages);
@@ -569,6 +576,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 saveAs(content, `${folderName}.zip`);
             });
         });
+        
 
         clearTableButton.addEventListener('click', () => {
             if (confirm("Sind Sie sicher, dass Sie alle Einträge löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.")) {

@@ -426,26 +426,22 @@
                 <option value="Ja">Ja</option>
                 <option value="Nein" selected>Nein</option>
             </select>
-
+            <br>
+            
             <!-- Fotoguide -->
-             <div class="photo-guide" id="photoGuide">
+            <label for="photo-guide">Fotos hinzufügen</label>
+            <div id="imagePreviewContainer"></div>
+            <div class="photo-guide" id="photoGuide">
                 <h3>Fotoguide</h3>
                 <p id="photoGuideText">Foto 1: Bitte mach ein Foto vom Versandkarton</p>
+                <br>
                 <button type="button" id="uploadImagesButton">Bilder hinzufügen</button>
             </div>
             <input type="file" id="partImages" accept="image/*" capture="environment" multiple class="hidden">
-            <div id="imagePreviewContainer"></div>
+        
+            <br>
+            <button type="submit">Eintrag zur Liste hinzufügen</button>
             
-            <div class="photo-confirmation-dialog" id="photoConfirmationDialog">
-                <div class="dialog-content">
-                    <img id="previewImage" src="" alt="Preview image">
-                    <button id="confirmImageButton">Bild bestätigen</button>
-                    <button id="retakeImageButton">Bild erneut aufnehmen</button>
-                </div>
-            </div>
-
-            
-            <button type="submit">Hinzufügen</button>
         </form>      
 
         <div class="pagination-container">
