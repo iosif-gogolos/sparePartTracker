@@ -379,6 +379,9 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             imagePreviewContainer.appendChild(img);
         });
+
+        //scroll to the form
+        document.getElementById('addPartForm').scrollIntoView({ behavior: 'smooth' });
     }
 
     function savePartToStorage(part) {
