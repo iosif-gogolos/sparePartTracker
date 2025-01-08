@@ -506,74 +506,75 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert("Alle Einträge wurden gelöscht.");
             }
         });
-        document.getElementById('importButton').addEventListener('click', () => {
+        
 
+        document.getElementById('importButton').addEventListener('click', () => {
             const fileInput = document.getElementById('importFile');
-                const file = fileInput.files[0];
-            
-                if (!file) {
-                    alert("Bitte wählen Sie eine Datei aus.");
-                    return;
-                }
-            
-                const reader = new FileReader();
-            
-                reader.onload = (event) => {
-                    const data = new Uint8Array(event.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-            
-                    const sheetName = workbook.SheetNames[0];
-                    const sheet = workbook.Sheets[sheetName];
-            
-                    const importedData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-            
-                    const headers = importedData[0];
-                    importedData.slice(1).forEach((row, index) => {
-                        const newPart = {
-                            id: uniqueId++,
-                            licensePlate: row[headers.indexOf('licensePlate')] || `Unbekannt ${index}`,
-                            partNumber: row[headers.indexOf('partNumber')] || "",
-                            description: row[headers.indexOf('description')] || "",
-                            complaintDate: row[headers.indexOf('complaintDate')] || "",
-                            reason: row[headers.indexOf('reason')] || "",
-                            price: row[headers.indexOf('price')] || "0",
-                            remarks: row[headers.indexOf('remarks')] || "",
-                            creditAvailable: row[headers.indexOf('creditAvailable')] || "Nein",
-                            images: []
-                        };
-            
-                        storedParts.push(newPart);
-                    });
-            
-                    // Ensure unique IDs for all parts
-                    if (storedParts.length > 0) {
-                        uniqueId = Math.max(...storedParts.map(part => part.id)) + 1;
-                    } else {
-                        uniqueId = 1;
-                    }
-            
-                    // Store the imported data in localStorage
-                    localStorage.setItem('partsData', JSON.stringify(storedParts));
-                    filteredParts = storedParts;
-            
-                    // Render the table with the imported data
-                    renderTable();
-                    updateDashboard();
-                    exportButton.classList.remove('hidden');
-                    updateClearButtonVisibility();
-                    alert("Import erfolgreich abgeschlossen!");
-                };
-            
-                reader.onerror = (error) => {
-                    alert("Fehler beim Lesen der Datei: " + error.message);
-                };
-            
-                if (file.name.endsWith('.csv')) {
-                    reader.readAsText(file);
+            const file = fileInput.files[0];
+        
+            if (!file) {
+                alert("Bitte wählen Sie eine Datei aus.");
+                return;
+            }
+        
+            const reader = new FileReader();
+        
+            reader.onload = (event) => {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+        
+                const sheetName = workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+        
+                const importedData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        
+                const headers = importedData[0];
+                importedData.slice(1).forEach((row, index) => {
+                    const newPart = {
+                        id: uniqueId++,
+                        licensePlate: row[headers.indexOf('licensePlate')] || `Unbekannt ${index}`,
+                        partNumber: row[headers.indexOf('partNumber')] || "",
+                        description: row[headers.indexOf('description')] || "",
+                        complaintDate: row[headers.indexOf('complaintDate')] || "",
+                        reason: row[headers.indexOf('reason')] || "",
+                        price: row[headers.indexOf('price')] || "0",
+                        remarks: row[headers.indexOf('remarks')] || "",
+                        creditAvailable: row[headers.indexOf('creditAvailable')] || "Nein",
+                        images: []
+                    };
+        
+                    storedParts.push(newPart);
+                });
+        
+                // Ensure unique IDs for all parts
+                if (storedParts.length > 0) {
+                    uniqueId = Math.max(...storedParts.map(part => part.id)) + 1;
                 } else {
-                    reader.readAsArrayBuffer(file);
+                    uniqueId = 1;
                 }
-            });
+        
+                // Store the imported data in localStorage
+                localStorage.setItem('partsData', JSON.stringify(storedParts));
+                filteredParts = storedParts;
+        
+                // Render the table with the imported data
+                renderTable();
+                updateDashboard();
+                exportButton.classList.remove('hidden');
+                updateClearButtonVisibility();
+                alert("Import erfolgreich abgeschlossen!");
+            };
+        
+            reader.onerror = (error) => {
+                alert("Fehler beim Lesen der Datei: " + error.message);
+            };
+        
+            if (file.name.endsWith('.csv')) {
+                reader.readAsText(file);
+            } else {
+                reader.readAsArrayBuffer(file);
+            }
+        });
             
 
         window.onload = () => {
