@@ -158,7 +158,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 reason: document.getElementById('reason').value,
                 price: document.getElementById('price').value,
                 remarks: document.getElementById('remarks').value,
-                creditAvailable: document.getElementById('creditAvailable').value,
+                //creditAvailable: document.getElementById('creditAvailable').value,
+                retoureLabelReceived: document.getElementById('retoureLabelReceived').value,
+
                 images: imageFiles // Assign the images array directly
             };
 
@@ -200,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>${part.reason}</td>
                 <td>${part.price}</td>
                 <td>${part.remarks}</td>
-                <td>${part.creditAvailable}</td>
+                <td>${part.retoureLabelReceived}</td>
                 <td>
                     <button class="icon-button delete-btn" title="Löschen">
                         <span class="material-icons">delete</span>
@@ -345,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('reason').value = part.reason;
             document.getElementById('price').value = part.price;
             document.getElementById('remarks').value = part.remarks;
-            document.getElementById('creditAvailable').value = part.creditAvailable;
+            document.getElementById('retoureLabelReceived').value = part.retoureLabelReceived;
             addButton.textContent = 'Speichern';
             isEditing = true;
             editingId = part.id;
@@ -393,13 +395,16 @@ document.addEventListener('DOMContentLoaded', function() {
         function updateDashboard() {
             const notReturnedCount = storedParts.length;
             const totalPrice = storedParts.reduce((sum, part) => sum + parseFloat(part.price || 0), 0);
-            const creditPrice = storedParts.filter(part => part.creditAvailable === 'Ja').reduce((sum, part) => sum + parseFloat(part.price || 0), 0);
-            const openAmount = totalPrice - creditPrice;
+            const returnedParts =storedParts.filter(part => part.retoureLabelReceived === 'Ja');
+            const returnedCount = returnedParts.length;
+            const returnedPrice = returnedParts.reduce((sum, part) => sum + parseFloat(part.price || 0), 0);
+            const openAmount = totalPrice - returnedPrice;
 
             document.getElementById('notReturnedCount').textContent = notReturnedCount;
             document.getElementById('totalPrice').textContent = `${totalPrice.toFixed(2)} €`;
-            document.getElementById('creditPrice').textContent = `${creditPrice.toFixed(2)} €`;
-            document.getElementById('openAmount').textContent = `${openAmount.toFixed(2)} €`;
+            document.getElementById('returnedCount').textContent = returnedCount;
+            //document.getElementById('returnedPrice').textContent = `${returnedPrice.toFixed(2)} €`;
+            //document.getElementById('openAmount').textContent = `${openAmount.toFixed(2)} €`;
 
             const recommendationText = document.getElementById('recommendationText');
             if (openAmount > 1000) {
@@ -541,7 +546,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             reason: row[headers.indexOf('reason')] || "",
                             price: row[headers.indexOf('price')] || "0",
                             remarks: row[headers.indexOf('remarks')] || "",
-                            creditAvailable: row[headers.indexOf('creditAvailable')] || "Nein",
+                            retoureLabelReceived: row[headers.indexOf('retoureLabelReceived')] || "Nein",
                             images: []
                         };
             
