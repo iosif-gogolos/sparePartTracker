@@ -438,7 +438,15 @@
                 <button type="button" id="uploadImagesButton">Bilder hinzufügen</button>
             </div>
             <input type="file" id="partImages" accept="image/*" capture="environment" multiple class="hidden">
-        
+            <!-- Bildvorschau-Overlay -->
+            <div class="image-preview-overlay" id="imagePreviewOverlay">
+                <button class="close-button" id="closePreviewButton">&times;</button>
+                <img id="previewImage" src="" alt="Preview image">
+                <div>
+                    <button id="confirmImageButton">Bild bestätigen</button>
+                    <button id="retakeImageButton">Bild erneut aufnehmen</button>
+                </div>
+            </div>
             <br>
             <button type="submit">Eintrag zur Liste hinzufügen</button>
             
