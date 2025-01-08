@@ -10,10 +10,10 @@ app.use(cors()); // enable CORS
 app.use(bodyParser.json());
 
 app.post('/api/parts', (req, res) => {
-    const { licensePlate, partNumber, description, complaintDate, reason, price, remarks, creditAvailable, images } = req.body;
-    const query = `INSERT INTO spareParts (licensePlate, partNumber, description, complaintDate, reason, price, remarks, creditAvailable, images) 
+    const { licensePlate, partNumber, description, complaintDate, reason, price, remarks, retoureLabelReceived, images } = req.body;
+    const query = `INSERT INTO spareParts (licensePlate, partNumber, description, complaintDate, reason, price, remarks, retoureLabelReceived, images) 
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    db.run(query, [licensePlate, partNumber, description, complaintDate, reason, price, remarks, creditAvailable, JSON.stringify(images)], function(err) {
+    db.run(query, [licensePlate, partNumber, description, complaintDate, reason, price, remarks, retoureLabelReceived, JSON.stringify(images)], function(err) {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -32,9 +32,9 @@ app.get('/api/parts', (req, res) => {
 
 app.put('/api/parts/:id', (req, res) => {
     const { id } = req.params;
-    const { licensePlate, partNumber, description, complaintDate, reason, price, remarks, creditAvailable, images } = req.body;
-    const query = `UPDATE spareParts SET licensePlate = ?, partNumber = ?, description = ?, complaintDate = ?, reason = ?, price = ?, remarks = ?, creditAvailable = ?, images = ? WHERE id = ?`;
-    db.run(query, [licensePlate, partNumber, description, complaintDate, reason, price, remarks, creditAvailable, JSON.stringify(images), id], function(err) {
+    const { licensePlate, partNumber, description, complaintDate, reason, price, remarks, retoureLabelReceived, images } = req.body;
+    const query = `UPDATE spareParts SET licensePlate = ?, partNumber = ?, description = ?, complaintDate = ?, reason = ?, price = ?, remarks = ?, retoureLabelReceived = ?, images = ? WHERE id = ?`;
+    db.run(query, [licensePlate, partNumber, description, complaintDate, reason, price, remarks, retoureLabelReceived, JSON.stringify(images), id], function(err) {
         if (err) {
             return res.status(500).json({ error: err.message });
         }

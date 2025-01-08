@@ -159,8 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 price: document.getElementById('price').value,
                 remarks: document.getElementById('remarks').value,
                 //creditAvailable: document.getElementById('creditAvailable').value,
-                retoureLabelReceived: document.getElementById('retoureLabelReceived').value,
-
+                retoureLabelReceived: document.getElementById('retoureLabelReceived').value || "Nein",
                 images: imageFiles // Assign the images array directly
             };
 
