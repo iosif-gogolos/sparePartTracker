@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="main.js"></script>
+</head>
+<body>
+    <div id="dashboard">
+        <h2>Dashboard</h2>
+        <div class="stats-grid">
+            <div class="stat">
+                <h3>Anzahl nicht retournierter Teile</h3>
+                <p id="notReturnedCount">0</p>
+            </div>
+            <div class="stat">
+                <h3>Summe Preis (alle Ersatzteile)</h3>
+                <p id="totalPrice">0 €</p>
+            </div>
+            <div class="stat">
+                <h3>Anzahl erfolgreich<br/>retournierter Ersatzteile</h3>
+                <p id="returnedCount">0</p>
+            </div>
+            <div class="stat">
+                <h3>Summe retournierter Ersatzteile</h3>
+                <p id="returnedPrice">0 €</p>
+            </div>
+            <div id="chartsContainer">
+                <canvas id="partsChart"></canvas>
+                <canvas id="priceChart"></canvas>
+                <canvas id="timeSeriesChart"></canvas>
+            </div>
+        </div>
+        <br>
+        <div class="filter-container">
+            <label for="filterInterval">Intervall</label>
+            <select id="filterInterval">
+                <option value="day">Tag</option>
+                <option value="week">Woche</option>
+                <option value="month">Monat</option>
+            </select>
+            <button id="applyFiltersButton">Filter anwenden</button>
+            <button id="clearFiltersButton">Filter zurücksetzen</button>
+        </div>
+        <br>
+        <div id="recommendation" class="recommendation-box">
+            <h3>Handlungsempfehlung</h3>
+            <p id="recommendationText">Keine Empfehlungen verfügbar.</p>
+        </div>
+    </div>
+</body>
+</html>
+
+<div id="chartsContainer">
+    <canvas id="partsChart"></canvas>
+    <canvas id="priceChart"></canvas>
+    <canvas id="timeSeriesChart"></canvas>
+</div>
+<br>
+<div class="filter-container">
+    <label for="filterInterval">Intervall</label>
+    <select id="filterInterval">
+        <option value="day">Tag</option>
+        <option value="week">Woche</option>
+        <option value="month">Monat</option>
+    </select>
+    <button id="applyFiltersButton">Filter anwenden</button>
+    <button id="clearFiltersButton">Filter zurücksetzen</button>
+</div>

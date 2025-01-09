@@ -18,6 +18,8 @@
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
 
         <script src="main.js"></script>
         <script src="developerMode.js"></script>
@@ -30,9 +32,9 @@
           <div class="container">
             <div class="row">
               <div class="col-sm-8 col-md-7 py-4">
-                <h4 class="text-white">About</h4>
-                <p class="text-muted">This application helps you track returned spare parts efficiently. You can add, edit, and delete entries, view statistics, and export data. The dashboard provides an overview of the total number of parts, their status, and financial summaries.</p>
-                <p class="text-muted">Current Software Version: V. 1.0.01.09.2025</p>
+                <h4 class="text-white">Ersatzteil-Tracker</h4>
+                <p class="text-muted">Diese Anwendung hilft Ihnen, zurückgegebene Ersatzteile effizient zu verfolgen. Sie können Einträge hinzufügen, bearbeiten und löschen, Statistiken einsehen und Daten exportieren. Das Dashboard bietet einen Überblick über die Gesamtzahl der Teile, ihren Status und finanzielle Zusammenfassungen.</p>
+                <p class="text-muted">Aktuelle Software Version: V. 1.0.01.09.2025</p>
               </div>
               <!-- <div class="col-sm-4 offset-md-1 py-4">
                 <h4 class="text-white">Dash</h4>
@@ -46,8 +48,8 @@
         <div class="navbar navbar-dark bg-dark shadow-sm">
           <div class="container d-flex justify-content-between">
             <a href="#" class="navbar-brand d-flex align-items-center">
-              <img src="assets/appicon.png" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-              <strong>Ersatzteil-Tracker</strong>
+              <img src="assets/appicon.png" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+              <strong>Station Markgröningen</strong>
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
@@ -75,34 +77,13 @@
                     <h3>Anzahl erfolgreich<br/>retournierter Ersatzteile</h3>
                     <p id="returnedCount">0</p>
                 </div>
-
                 <div class="stat">
                     <h3>Summe retournierter Ersatzteile</h3>
                     <p id="returnedPrice">0 €</p>
                 </div>
-                <div id="chartsContainer">
-                    <canvas id="partsChart"></canvas>
-                    <canvas id="priceChart"></canvas>
-                    <canvas id="timeSeriesChart"></canvas>
-
-                </div>
-                
-                
             </div>
-            <br>
-            <div class="filter-container">
-                        
-                <label for="filterInterval">Intervall</label>
-                <select id="filterInterval">
-                    <option value="day">Tag</option>
-                    <option value="week">Woche</option>
-                    <option value="month">Monat</option>
-                </select>
             
-                <button id="applyFiltersButton">Filter anwenden</button>
-                <button id="clearFiltersButton">Filter zurücksetzen</button>
-            </div>
-                <br>
+            <br>
             <div id="recommendation" class="recommendation-box">
                 <h3>Handlungsempfehlung</h3>
                 <p id="recommendationText">Keine Empfehlungen verfügbar.</p>
@@ -271,7 +252,7 @@
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <label for="developerModeToggle">Developer Modus</label>
+                    <label for="developerModeToggle">Entwicklermodus</label>
                     <input type="checkbox" id="developerModeToggle" data-toggle="toggle" data-on="An" data-off="Aus" data-onstyle="success" data-offstyle="danger">
                 </div>
                 <div id="developerButtons" class="developer-buttons">

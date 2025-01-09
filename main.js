@@ -47,6 +47,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let entriesPerPage = parseInt(entriesPerPageSelect.value, 10);
     let storedParts = [];
     let filteredParts = [];
+    let partsChart;
+    let priceChart;
+    let timeSeriesChart;
 
 
     function initializeExcelSheet() {
@@ -502,16 +505,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         document.getElementById('dashboard').classList.remove('hidden');
 
-        updateCharts(notReturnedCount, returnedCount, totalPrice, returnedPrice);
+        //updateCharts(notReturnedCount, returnedCount, totalPrice, returnedPrice);
     }
     
-    function updateCharts(notReturnedCount, returnedCount, totalPrice, returnedPrice) {
+    /* function updateCharts(notReturnedCount, returnedCount, totalPrice, returnedPrice) {
         const partsChartCtx = document.getElementById('partsChart').getContext('2d');
         const priceChartCtx = document.getElementById('priceChart').getContext('2d');
         const timeSeriesChartCtx = document.getElementById('timeSeriesChart').getContext('2d');
-    
+
+        // Destroy existing charts if they exist
+        if (partsChart) partsChart.destroy();
+        if (priceChart) priceChart.destroy();
+        if (timeSeriesChart) timeSeriesChart.destroy();
+
         // Parts Chart
-        new Chart(partsChartCtx, {
+        partsChart = new Chart(partsChartCtx, {
             type: 'pie',
             data: {
                 labels: ['Nicht retournierte Teile', 'Erfolgreich retournierte Teile'],
@@ -533,9 +541,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-    
+
         // Price Chart
-        new Chart(priceChartCtx, {
+        priceChart = new Chart(priceChartCtx, {
             type: 'bar',
             data: {
                 labels: ['Gesamtpreis', 'Retournierter Preis'],
@@ -558,65 +566,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-    
+
         // Time Series Chart
-        const interval = document.getElementById('filterInterval').value;
-        const dates = storedParts.map(part => part.complaintDate);
-        const counts = dates.reduce((acc, date) => {
-            acc[date] = (acc[date] || 0) + 1;
-            return acc;
-        }, {});
-    
-        const sortedDates = Object.keys(counts).sort((a, b) => new Date(a) - new Date(b));
-        const sortedCounts = sortedDates.map(date => counts[date]);
-    
-        new Chart(timeSeriesChartCtx, {
-            type: 'line',
-            data: {
-                labels: sortedDates,
-                datasets: [{
-                    label: 'Anzahl der Ersatzteile',
-                    data: sortedCounts,
-                    borderColor: '#36a2eb',
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: interval,
-                            tooltipFormat: 'DD/MM/YYYY'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Datum'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Anzahl der Ersatzteile'
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Ersatzteile über die Zeit'
-                    }
-                }
-            }
-        });
+        updateTimeSeriesChart();
     }
-
-
-    function updateTimeSeriesChart() {
+ */
+    /* function updateTimeSeriesChart() {
         const timeSeriesChartCtx = document.getElementById('timeSeriesChart').getContext('2d');
         const interval = document.getElementById('filterInterval').value;
         const dates = storedParts.map(part => part.complaintDate);
@@ -628,7 +583,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const sortedDates = Object.keys(counts).sort((a, b) => new Date(a) - new Date(b));
         const sortedCounts = sortedDates.map(date => counts[date]);
 
-        new Chart(timeSeriesChartCtx, {
+        // Destroy existing time series chart if it exists
+        if (timeSeriesChart) timeSeriesChart.destroy();
+
+        timeSeriesChart = new Chart(timeSeriesChartCtx, {
             type: 'line',
             data: {
                 labels: sortedDates,
@@ -671,7 +629,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-    }
+    } */
 
     function updatePaginationButtons() {
         const totalPages = Math.ceil(filteredParts.length / entriesPerPage);
@@ -910,6 +868,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeExcelSheet();
         loadPartsFromStorage();
         updateFilterOptions();
+        //updateCharts();
         updateDashboard();
         updateClearButtonVisibility();
     }; 
