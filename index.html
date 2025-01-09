@@ -19,6 +19,7 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         <script src="main.js"></script>
         <script src="developerMode.js"></script>
+
     </head>
 <body>
 
@@ -122,6 +123,32 @@
             <button id="prevPageButton">Vorherige Seite</button>
             <button id="nextPageButton">Nächste Seite</button>
         </div>
+
+        <div class="filter-container">
+            <label for="filterLicensePlate">Kennzeichen</label>
+            <input type="text" id="filterLicensePlate" placeholder="Nach Kennzeichen filtern">
+
+            <label for="filterPartNumber">Teilenummner</label>
+            <input type="text" id="filterPartNumber" placeholder="Nach Teilenummer filtern">
+
+            <label for="filterReason">Grund der Retoure</label>
+            <select id="filterReason">
+                <option value="">Alle</option>
+                <option value="Beschädigt">Beschädigt</option>
+                <option value="Falsch geliefert">Falsch geliefert</option>
+            </select>
+
+            <label for="filterRetoureLabelReceived">Retourelabel erhalten</label>
+            <select id="filterRetoureLabelReceived">
+                <option value="">Alle</option>
+                <option value="Ja">Ja</option>
+                <option value="Nein">Nein</option>
+            </select>
+
+            <button id="applyFiltersButton">Filter anwenden</button>
+            <button id="clearFiltersButton">Filter zurücksetzen</button>
+        </div>
+
 
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Suchen...">

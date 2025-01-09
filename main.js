@@ -662,7 +662,45 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         });
 
-        
+        const filterLicensePlate = document.getElementById('filterLicensePlate');
+        const filterPartNumber = document.getElementById('filterPartNumber');
+        const filterReason = document.getElementById('filterReason');
+        const applyFiltersButton = document.getElementById('applyFiltersButton');
+        const clearFiltersButton = document.getElementById('clearFiltersButton');
+    
+        applyFiltersButton.addEventListener('click', () => {
+            applyFilters();
+        });
+    
+        clearFiltersButton.addEventListener('click', () => {
+            clearFilters();
+        });
+    
+        function applyFilters() {
+            const licensePlateFilter = filterLicensePlate.value.toLowerCase();
+            const partNumberFilter = filterPartNumber.value.toLowerCase();
+            const reasonFilter = filterReason.value;
+    
+            filteredParts = storedParts.filter(part => {
+                return (
+                    (licensePlateFilter === '' || part.licensePlate.toLowerCase().includes(licensePlateFilter)) &&
+                    (partNumberFilter === '' || part.partNumber.toLowerCase().includes(partNumberFilter)) &&
+                    (reasonFilter === '' || part.reason === reasonFilter)
+                );
+            });
+    
+            currentPage = 1;
+            renderTable();
+        }
+    
+        function clearFilters() {
+            filterLicensePlate.value = '';
+            filterPartNumber.value = '';
+            filterReason.value = '';
+            filteredParts = storedParts;
+            currentPage = 1;
+            renderTable();
+        }
 
     window.onload = () => {
         initializeExcelSheet();

@@ -397,3 +397,31 @@ h1.display-4 {
     font-weight: bold;
     margin: 0;
 }
+
+.filter-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.filter-container label {
+    font-weight: bold;
+}
+
+.filter-container input, .filter-container select, .filter-container button {
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+
+.filter-container button {
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.filter-container button:hover {
+    background-color: #003e70;
+}
