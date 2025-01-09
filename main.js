@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterLicensePlate = document.getElementById('filterLicensePlate');
     const filterPartNumber = document.getElementById('filterPartNumber');
     const filterReason = document.getElementById('filterReason');
+    const filterDate = document.getElementById('filterDate');
     const applyFiltersButton = document.getElementById('applyFiltersButton');
     const clearFiltersButton = document.getElementById('clearFiltersButton');
     const partsTableBody = document.querySelector('#partsTable tbody');
@@ -685,14 +686,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const licensePlateFilter = filterLicensePlate.value.toLowerCase();
             const partNumberFilter = filterPartNumber.value.toLowerCase();
             const reasonFilter = filterReason.value;
+            const dateFilter = filterDate.value;
     
             filteredParts = storedParts.filter(part => {
-                return (
-                    (licensePlateFilter === '' || part.licensePlate.toLowerCase().includes(licensePlateFilter)) &&
-                    (partNumberFilter === '' || part.partNumber.toLowerCase().includes(partNumberFilter)) &&
-                    (reasonFilter === '' || part.reason === reasonFilter)
-                );
+                const matchesLicensePlate = licensePlateFilter === '' || part.licensePlate.toLowerCase().includes(licensePlateFilter);
+                const matchesPartNumber = partNumberFilter === '' || part.partNumber.toLowerCase().includes(partNumberFilter);
+                const matchesReason = reasonFilter === '' || part.reason === reasonFilter;
+                const matchesDate = dateFilter === '' || part.complaintDate === dateFilter;
+
+                return matchesLicensePlate && matchesPartNumber && matchesReason && matchesDate;
             });
+            filteredParts.sort((a, b) => new Date(a.complaintDate) - new Date(b.complaintDate));
     
             currentPage = 1;
             renderTable();
