@@ -662,22 +662,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         });
 
-    const developerModeToggle = document.getElementById('developerModeToggle');
-    const developerModeToggleContainer = document.getElementById('developerModeToggleContainer');
-    const loadListeButton = document.getElementById('loadListeButton');
-    const loadExcelDataButton = document.getElementById('loadExcelDataButton');
-
-    developerModeToggle.addEventListener('change', () => {
-        if (developerModeToggle.checked) {
-            developerModeToggleContainer.classList.remove('hidden');
-            loadListeButton.classList.remove('hidden');
-            loadExcelDataButton.classList.remove('hidden');
-        } else {
-            developerModeToggleContainer.classList.add('hidden');
-            loadListeButton.classList.add('hidden');
-            loadExcelDataButton.classList.add('hidden');
-        }
-    });
+        const developerModeToggle = document.getElementById('developerModeToggle');
+        const developerModeToggleContainer = document.getElementById('developerModeToggleContainer');
+        const loadListeButton = document.getElementById('loadListeButton');
+        const loadExcelDataButton = document.getElementById('loadExcelDataButton');
+    
+        developerModeToggle.addEventListener('change', () => {
+            if (developerModeToggle.checked) {
+                developerModeToggleContainer.classList.remove('hidden');
+                loadListeButton.classList.remove('hidden');
+                loadExcelDataButton.classList.remove('hidden');
+            } else {
+                developerModeToggleContainer.classList.add('hidden');
+                loadListeButton.classList.add('hidden');
+                loadExcelDataButton.classList.add('hidden');
+            }
+        });
 
     loadListeButton.addEventListener('click', () => {
         loadExcelData('Liste.xlsx');
