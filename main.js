@@ -7,8 +7,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterPartNumber = document.getElementById('filterPartNumber');
     const filterReason = document.getElementById('filterReason');
     const filterDate = document.getElementById('filterDate');
+    const filterInterval = document.getElementById('filterInterval');
     const applyFiltersButton = document.getElementById('applyFiltersButton');
     const clearFiltersButton = document.getElementById('clearFiltersButton');
+    const filterStartDate = document.getElementById('filterStartDate');
+    const filterEndDate = document.getElementById('filterEndDate');
+
+
     const partsTableBody = document.querySelector('#partsTable tbody');
     const exportButton = document.getElementById('exportButton');
     const addButton = addPartForm.querySelector('button[type="submit"]');
@@ -48,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let storedParts = [];
     let filteredParts = [];
     let partsChart;
-    let priceChart;
+    //let priceChart;
     let timeSeriesChart;
 
 
@@ -333,27 +338,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
-    // OCR Erkennung
-    async function performOCR(imageSrc) {
-        const {data: {text}} = await Tesseract.recognize(
-            imageSrc,
-            'eng',
-            {
-                logger: m => console.log(m)
-            }
-        );
-        return text;
-    }
-
-    function displayOCRResults(ocrText) {
-        const ocrResultsContainer = document.getElementById('ocrResultsContainer');
-        const ocrResultDiv = document.createElement('div');
-        ocrResultDiv.classList.add('ocr-result');
-        ocrResultDiv.textContent = ocrText;
-        ocrResultsContainer.appendChild(ocrResultDiv);
-    }
-
     function removePartFromTable(id) {
         storedParts = storedParts.filter(part => part.id !== id);
         localStorage.setItem('partsData', JSON.stringify(storedParts));
@@ -509,14 +493,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /* function updateCharts(notReturnedCount, returnedCount, totalPrice, returnedPrice) {
+        
+                
         const partsChartCtx = document.getElementById('partsChart').getContext('2d');
-        const priceChartCtx = document.getElementById('priceChart').getContext('2d');
+        //const priceChartCtx = document.getElementById('priceChart').getContext('2d');
         const timeSeriesChartCtx = document.getElementById('timeSeriesChart').getContext('2d');
 
         // Destroy existing charts if they exist
-        if (partsChart) partsChart.destroy();
-        if (priceChart) priceChart.destroy();
-        if (timeSeriesChart) timeSeriesChart.destroy();
+        if (partsChart) {
+            partsChart.destroy();
+            partsChart = null;
+        }
+
 
         // Parts Chart
         partsChart = new Chart(partsChartCtx, {
@@ -529,6 +517,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }]
             },
             options: {
+                
                 responsive: true,
                 plugins: {
                     legend: {
@@ -542,38 +531,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Price Chart
-        priceChart = new Chart(priceChartCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Gesamtpreis', 'Retournierter Preis'],
-                datasets: [{
-                    label: 'Preis in €',
-                    data: [totalPrice, returnedPrice],
-                    backgroundColor: ['#ff6384', '#36a2eb']
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Preisübersicht'
-                    }
-                }
-            }
-        });
-
         // Time Series Chart
         updateTimeSeriesChart();
     }
- */
-    /* function updateTimeSeriesChart() {
+ 
+    function updateTimeSeriesChart() {
         const timeSeriesChartCtx = document.getElementById('timeSeriesChart').getContext('2d');
-        const interval = document.getElementById('filterInterval').value;
+        const interval = filterInterval.value;
         const dates = storedParts.map(part => part.complaintDate);
         const counts = dates.reduce((acc, date) => {
             acc[date] = (acc[date] || 0) + 1;
@@ -584,7 +548,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const sortedCounts = sortedDates.map(date => counts[date]);
 
         // Destroy existing time series chart if it exists
-        if (timeSeriesChart) timeSeriesChart.destroy();
+        if (timeSeriesChart) {
+            timeSeriesChart.destroy();
+            timeSeriesChart = null;
+        }
 
         timeSeriesChart = new Chart(timeSeriesChartCtx, {
             type: 'line',
@@ -612,6 +579,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     },
                     y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1, // Ensure only whole numbers are displayed
+                            callback: function(value) {
+                                if (Number.isInteger(value)) {
+                                    return value;
+                                }
+                            }
+                        },
                         title: {
                             display: true,
                             text: 'Anzahl der Ersatzteile'
@@ -629,7 +605,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-    } */
+    }  */
 
     function updatePaginationButtons() {
         const totalPages = Math.ceil(filteredParts.length / entriesPerPage);
@@ -808,31 +784,53 @@ document.addEventListener('DOMContentLoaded', function() {
         clearFiltersButton.addEventListener('click', () => {
             clearFilters();
         });
-    
+        
+        const filterDescription = document.getElementById('filterDescription');
+
         function applyFilters() {
             const licensePlateFilter = filterLicensePlate.value.toLowerCase();
             const partNumberFilter = filterPartNumber.value.toLowerCase();
             const reasonFilter = filterReason.value;
+            const descriptionFilter = filterDescription.value.toLowerCase();
             const dateFilter = filterDate.value;
+            const startDateFilter = filterStartDate.value;
+            const endDateFilter = filterEndDate.value;
     
             filteredParts = storedParts.filter(part => {
                 const matchesLicensePlate = licensePlateFilter === '' || part.licensePlate.toLowerCase().includes(licensePlateFilter);
                 const matchesPartNumber = partNumberFilter === '' || part.partNumber.toLowerCase().includes(partNumberFilter);
                 const matchesReason = reasonFilter === '' || part.reason === reasonFilter;
+                const matchesDescription = descriptionFilter === '' || part.description.toLowerCase().includes(descriptionFilter);
                 const matchesDate = dateFilter === '' || part.complaintDate === dateFilter;
+                const matchesStartDate = startDateFilter === '' || new Date(part.complaintDate) >= new Date(startDateFilter);
+                const matchesEndDate = endDateFilter === '' || new Date(part.complaintDate) <= new Date(endDateFilter);
 
-                return matchesLicensePlate && matchesPartNumber && matchesReason && matchesDate;
+                return matchesLicensePlate && matchesPartNumber && matchesReason && matchesDescription && matchesDate && matchesStartDate && matchesEndDate;
             });
             filteredParts.sort((a, b) => new Date(a.complaintDate) - new Date(b.complaintDate));
+
     
             currentPage = 1;
             renderTable();
         }
 
+        applyFiltersButton.addEventListener('click', applyFilters);
+        clearFiltersButton.addEventListener('click', () => {
+            filterLicensePlate.value = '';
+            filterPartNumber.value = '';
+            filterReason.value = '';
+            filterDescription.value = '';
+            filterDate.value = '';
+            filterStartDate.value = '';
+            filterEndDate.value = '';
+            applyFilters();
+        });
+
         function updateFilterOptions() {
             const licensePlateSet = new Set();
             const partNumberSet = new Set();
             const reasonSet = new Set();
+            const descriptionSet = new Set();
 
             storedParts.forEach(part => {
                 licensePlateSet.add(part.licensePlate);
@@ -840,19 +838,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 reasonSet.add(part.reason);
             });
 
-            updateSelectOptions(document.getElementById('filterLicensePlate'), licensePlateSet);
-            updateSelectOptions(document.getElementById('filterPartNumber'), partNumberSet);
-            updateSelectOptions(document.getElementById('filterReason'), reasonSet);
+            const sortedLicensePlates = Array.from(licensePlateSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+            const sortedPartNumbers = Array.from(partNumberSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+            const sortedDescriptions = Array.from(descriptionSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+            const sortedReasons = Array.from(reasonSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+
+            updateSelectOptions(document.getElementById('filterLicensePlate'), sortedLicensePlates);
+            updateSelectOptions(document.getElementById('filterPartNumber'), sortedPartNumbers);
+            updateSelectOptions(document.getElementById('filterDescription'), sortedDescriptions);
+            updateSelectOptions(document.getElementById('filterReason'), sortedReasons);
         }
 
-        function updateSelectOptions(selectElement, optionsSet) {
+        function updateSelectOptions(selectElement, optionsArray) {
             selectElement.innerHTML = '<option value="">Alle</option>'; // Reset options
-            optionsSet.forEach(option => {
+            optionsArray.forEach(option => {
                 const optionElement = document.createElement('option');
                 optionElement.value = option;
                 optionElement.textContent = option;
                 selectElement.appendChild(optionElement);
-            }); 
+            });
         }
     
         function clearFilters() {
@@ -871,5 +875,6 @@ document.addEventListener('DOMContentLoaded', function() {
         //updateCharts();
         updateDashboard();
         updateClearButtonVisibility();
+        
     }; 
 });

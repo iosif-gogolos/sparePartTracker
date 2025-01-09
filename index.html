@@ -59,11 +59,11 @@
       </header>
     
     
-        
+      
     <div class="container">
 
         <div id="dashboard" class="hidden">
-            <h2>Dashboard</h2>
+            <h3>Dashboard</h3>
             <div class="stats-grid">
                 <div class="stat">
                     <h3>Anzahl nicht retournierter Teile</h3>
@@ -82,6 +82,16 @@
                     <p id="returnedPrice">0 €</p>
                 </div>
             </div>
+            
+            <!-- <div id="chartsContainer">
+                <div id="timeSeriesChartContainer">
+                    <canvas id="timeSeriesChart"></canvas>
+                </div>
+                
+                <div id="timeSeriesChartContainer">
+                    <canvas id="partsChart"></canvas>
+                </div>
+            </div> -->
             
             <br>
             <div id="recommendation" class="recommendation-box">
@@ -156,6 +166,7 @@
             <button id="nextPageButton">Nächste Seite</button>
         </div>
         <br>
+        
 
         <div class="filter-container">
             <label for="filterLicensePlate">Kennzeichen</label>
@@ -165,6 +176,11 @@
 
             <label for="filterPartNumber">Teilenummer</label>
             <select id="filterPartNumber">
+                <option value="">Alle</option>
+            </select>
+
+            <label for="filterDescription">Artikelname</label>
+            <select id="filterDescription">
                 <option value="">Alle</option>
             </select>
 
@@ -182,12 +198,27 @@
 
             <label for="filterDate">Reklamationsdatum</label>
             <input type="date" id="filterDate">
+            
+           <!--  <label for="filterInterval"></label>
+            <select id="filterInterval">
+                <option value="day"></option>
+                <option value="week"></option>
+                <option value="month"></option>
+            </select> -->
+
+            <div class="filter-container">
+                <!-- Existing filter options -->
+                <label for="filterStartDate">Startdatum</label>
+                <input type="date" id="filterStartDate">
+            
+                <label for="filterEndDate">Enddatum</label>
+                <input type="date" id="filterEndDate">
+            </div>
 
             <button id="applyFiltersButton">Filter anwenden</button>
             <button id="clearFiltersButton">Filter zurücksetzen</button>
         </div>
-
-
+        
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Suchen...">
             <button id="searchButton" title="Suchen">
@@ -234,13 +265,6 @@
                 <button type="button" id="importButton">Importieren</button>
             </form>
         </div>
-
-        <div id="ocrResultsSection" class="import-section">
-            <h2></h2>
-            <div id="ocrResultsContainer"></div>
-        </div>
-
-    </div>
 
     <div class="container">
         <div id="developerModeToggleContainer" class="hidden">
