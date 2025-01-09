@@ -484,7 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateDashboard() {
         const notReturnedCount = storedParts.length;
         const totalPrice = storedParts.reduce((sum, part) => sum + parseFloat(part.price || 0), 0);
-        const returnedParts =storedParts.filter(part => part.retoureLabelReceived === 'Ja');
+        const returnedParts = storedParts.filter(part => part.retoureLabelReceived === 'Ja');
         const returnedCount = returnedParts.length;
         const returnedPrice = returnedParts.reduce((sum, part) => sum + parseFloat(part.price || 0), 0);
         const openAmount = totalPrice - returnedPrice;
@@ -493,7 +493,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('totalPrice').textContent = `${totalPrice.toFixed(2)} €`;
         document.getElementById('returnedCount').textContent = returnedCount;
         document.getElementById('returnedPrice').textContent = `${returnedPrice.toFixed(2)} €`;
-        //document.getElementById('openAmount').textContent = `${openAmount.toFixed(2)} €`;
 
         const recommendationText = document.getElementById('recommendationText');
         if (openAmount > 1000) {
@@ -502,6 +501,176 @@ document.addEventListener('DOMContentLoaded', function() {
             recommendationText.textContent = "Keine Empfehlungen verfügbar.";
         }
         document.getElementById('dashboard').classList.remove('hidden');
+
+        updateCharts(notReturnedCount, returnedCount, totalPrice, returnedPrice);
+    }
+    
+    function updateCharts(notReturnedCount, returnedCount, totalPrice, returnedPrice) {
+        const partsChartCtx = document.getElementById('partsChart').getContext('2d');
+        const priceChartCtx = document.getElementById('priceChart').getContext('2d');
+        const timeSeriesChartCtx = document.getElementById('timeSeriesChart').getContext('2d');
+    
+        // Parts Chart
+        new Chart(partsChartCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Nicht retournierte Teile', 'Erfolgreich retournierte Teile'],
+                datasets: [{
+                    data: [notReturnedCount, returnedCount],
+                    backgroundColor: ['#ff6384', '#36a2eb']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Teile Status'
+                    }
+                }
+            }
+        });
+    
+        // Price Chart
+        new Chart(priceChartCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Gesamtpreis', 'Retournierter Preis'],
+                datasets: [{
+                    label: 'Preis in €',
+                    data: [totalPrice, returnedPrice],
+                    backgroundColor: ['#ff6384', '#36a2eb']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Preisübersicht'
+                    }
+                }
+            }
+        });
+    
+        // Time Series Chart
+        const interval = document.getElementById('filterInterval').value;
+        const dates = storedParts.map(part => part.complaintDate);
+        const counts = dates.reduce((acc, date) => {
+            acc[date] = (acc[date] || 0) + 1;
+            return acc;
+        }, {});
+    
+        const sortedDates = Object.keys(counts).sort((a, b) => new Date(a) - new Date(b));
+        const sortedCounts = sortedDates.map(date => counts[date]);
+    
+        new Chart(timeSeriesChartCtx, {
+            type: 'line',
+            data: {
+                labels: sortedDates,
+                datasets: [{
+                    label: 'Anzahl der Ersatzteile',
+                    data: sortedCounts,
+                    borderColor: '#36a2eb',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: interval,
+                            tooltipFormat: 'DD/MM/YYYY'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Datum'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Anzahl der Ersatzteile'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Ersatzteile über die Zeit'
+                    }
+                }
+            }
+        });
+    }
+
+
+    function updateTimeSeriesChart() {
+        const timeSeriesChartCtx = document.getElementById('timeSeriesChart').getContext('2d');
+        const interval = document.getElementById('filterInterval').value;
+        const dates = storedParts.map(part => part.complaintDate);
+        const counts = dates.reduce((acc, date) => {
+            acc[date] = (acc[date] || 0) + 1;
+            return acc;
+        }, {});
+
+        const sortedDates = Object.keys(counts).sort((a, b) => new Date(a) - new Date(b));
+        const sortedCounts = sortedDates.map(date => counts[date]);
+
+        new Chart(timeSeriesChartCtx, {
+            type: 'line',
+            data: {
+                labels: sortedDates,
+                datasets: [{
+                    label: 'Anzahl der Ersatzteile',
+                    data: sortedCounts,
+                    borderColor: '#36a2eb',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: interval,
+                            tooltipFormat: 'DD/MM/YYYY'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Datum'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Anzahl der Ersatzteile'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Ersatzteile über die Zeit'
+                    }
+                }
+            }
+        });
     }
 
     function updatePaginationButtons() {
