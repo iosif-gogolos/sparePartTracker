@@ -126,16 +126,18 @@
 
         <div class="filter-container">
             <label for="filterLicensePlate">Kennzeichen</label>
-            <input type="text" id="filterLicensePlate" placeholder="Nach Kennzeichen filtern">
+            <select id="filterLicensePlate">
+                <option value="">Alle</option>
+            </select>
 
-            <label for="filterPartNumber">Teilenummner</label>
-            <input type="text" id="filterPartNumber" placeholder="Nach Teilenummer filtern">
+            <label for="filterPartNumber">Teilenummer</label>
+            <select id="filterPartNumber">
+                <option value="">Alle</option>
+            </select>
 
             <label for="filterReason">Grund der Retoure</label>
             <select id="filterReason">
                 <option value="">Alle</option>
-                <option value="Beschädigt">Beschädigt</option>
-                <option value="Falsch geliefert">Falsch geliefert</option>
             </select>
 
             <label for="filterRetoureLabelReceived">Retourelabel erhalten</label>

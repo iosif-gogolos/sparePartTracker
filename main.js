@@ -3,6 +3,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     const addPartForm = document.getElementById('addPartForm');
+    const filterLicensePlate = document.getElementById('filterLicensePlate');
+    const filterPartNumber = document.getElementById('filterPartNumber');
+    const filterReason = document.getElementById('filterReason');
+    const applyFiltersButton = document.getElementById('applyFiltersButton');
+    const clearFiltersButton = document.getElementById('clearFiltersButton');
     const partsTableBody = document.querySelector('#partsTable tbody');
     const exportButton = document.getElementById('exportButton');
     const addButton = addPartForm.querySelector('button[type="submit"]');
@@ -283,6 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
         storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
         filteredParts = storedParts;
         renderTable();
+        updateFilterOptions();
         if (storedParts.length > 0) exportButton.classList.remove('hidden');
         updateClearButtonVisibility();
     }
@@ -349,6 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('partsData', JSON.stringify(storedParts));
         filteredParts = storedParts;
         renderTable();
+        updateFilterOptions();
         deletePartFromExcel(id); // Delete from the Excel sheet
         if (!partsTableBody.children.length) exportButton.classList.add('hidden');
         updateClearButtonVisibility();
@@ -389,6 +396,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('partsData', JSON.stringify(storedParts));
         filteredParts = storedParts;
         renderTable();
+        updateFilterOptions();
         updateClearButtonVisibility();
         updateDashboard(); // Aktualisiere die Metriken und Handlungsempfehlungen
     }
@@ -399,6 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('partsData', JSON.stringify(storedParts));
         filteredParts = storedParts;
         renderTable();
+        updateFilterOptions();
         updateClearButtonVisibility();
         updateDashboard(); // Aktualisiere die Metriken und Handlungsempfehlungen
     }
@@ -594,7 +603,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     document.getElementById('importButton').addEventListener('click', () => {
-
         const fileInput = document.getElementById('importFile');
         const file = fileInput.files[0];
 
@@ -645,6 +653,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Render the table with the imported data
             renderTable();
+            updateFilterOptions(); // Update filter options
             updateDashboard();
             exportButton.classList.remove('hidden');
             updateClearButtonVisibility();
@@ -662,11 +671,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         });
 
-        const filterLicensePlate = document.getElementById('filterLicensePlate');
-        const filterPartNumber = document.getElementById('filterPartNumber');
-        const filterReason = document.getElementById('filterReason');
-        const applyFiltersButton = document.getElementById('applyFiltersButton');
-        const clearFiltersButton = document.getElementById('clearFiltersButton');
+        
     
         applyFiltersButton.addEventListener('click', () => {
             applyFilters();
@@ -692,6 +697,32 @@ document.addEventListener('DOMContentLoaded', function() {
             currentPage = 1;
             renderTable();
         }
+
+        function updateFilterOptions() {
+            const licensePlateSet = new Set();
+            const partNumberSet = new Set();
+            const reasonSet = new Set();
+
+            storedParts.forEach(part => {
+                licensePlateSet.add(part.licensePlate);
+                partNumberSet.add(part.partNumber);
+                reasonSet.add(part.reason);
+            });
+
+            updateSelectOptions(document.getElementById('filterLicensePlate'), licensePlateSet);
+            updateSelectOptions(document.getElementById('filterPartNumber'), partNumberSet);
+            updateSelectOptions(document.getElementById('filterReason'), reasonSet);
+        }
+
+        function updateSelectOptions(selectElement, optionsSet) {
+            selectElement.innerHTML = '<option value="">Alle</option>'; // Reset options
+            optionsSet.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option;
+                selectElement.appendChild(optionElement);
+            }); 
+        }
     
         function clearFilters() {
             filterLicensePlate.value = '';
@@ -705,6 +736,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.onload = () => {
         initializeExcelSheet();
         loadPartsFromStorage();
+        updateFilterOptions();
         updateDashboard();
         updateClearButtonVisibility();
     }; 
