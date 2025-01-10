@@ -236,9 +236,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button class="icon-button delete-btn" title="Löschen">
                     <span class="material-icons">delete</span>
                 </button>
+                <br>
                 <button class="icon-button edit-btn" title="Bearbeiten">
                     <span class="material-icons">edit</span>
                 </button>
+                <br>
                 <button class="icon-button view-images-btn" title="Bilder anzeigen">
                     <span class="material-icons">photo</span>
                 </button>
@@ -246,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
 
         newRow.querySelector('.delete-btn').addEventListener('click', () => {
-            if (confirm(`Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`)) {
+            if (confirm(`Achtung\!\!\! \n \n Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`)) {
                 removePartFromTable(part.id);
             }
         });
