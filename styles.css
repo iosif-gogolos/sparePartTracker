@@ -412,11 +412,22 @@ h1.display-4 {
     flex-wrap: wrap;
     gap: 1rem;
     margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
 }
 
 .filter-container label {
     font-weight: bold;
     margin-right: 0.5rem;
+}
+
+.filter-container input, .filter-container select, .filter-container button {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 .filter-container input, .filter-container select, .filter-container button {
