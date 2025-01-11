@@ -5,6 +5,39 @@ body {
     margin: 0;
     padding: 0;
 }
+
+.div {
+	width: 100%;
+	border: 2px solid maroon;
+	padding: 50px;
+	margin: 20px;
+}
+
+.partsTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.partsTable th, .partsTable td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: left;
+}
+
+.partsTable th {
+    background-color: #f4f4f4;
+}
+
+/* Zebra-Streifen-Effekt */
+.partsTable tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.partsTable tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -494,6 +527,7 @@ h1.display-4 {
         display: block;
         overflow-x: auto;
     }
+    
 
     .filter-container {
         flex-direction: column;
