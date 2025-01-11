@@ -166,8 +166,66 @@
             <button id="nextPageButton">Nächste Seite</button>
         </div>
         <br>
-        
-
+        <div class="container mt-4">
+            <div class="card">
+                <div class="card-header">
+                    Filteroptionen
+                </div>
+                <div class="card-body">
+                    <form id="filterForm" class="form-row">
+                        <div class="form-group col-md-3">
+                            <label for="filterLicensePlate">Kennzeichen</label>
+                            <select id="filterLicensePlate" class="form-control">
+                                <option value="">Alle</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="filterPartNumber">Teilenummer</label>
+                            <select id="filterPartNumber" class="form-control">
+                                <option value="">Alle</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="filterDescription">Artikelname</label>
+                            <select id="filterDescription" class="form-control">
+                                <option value="">Alle</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="filterReason">Grund der Retoure</label>
+                            <select id="filterReason" class="form-control">
+                                <option value="">Alle</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="filterRetoureLabelReceived">Retourelabel erhalten</label>
+                            <select id="filterRetoureLabelReceived" class="form-control">
+                                <option value="">Alle</option>
+                                <option value="Ja">Ja</option>
+                                <option value="Nein">Nein</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="filterDate">Reklamationsdatum</label>
+                            <input type="date" id="filterDate" class="form-control">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="filterStartDate">Startdatum</label>
+                            <input type="date" id="filterStartDate" class="form-control">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="filterEndDate">Enddatum</label>
+                            <input type="date" id="filterEndDate" class="form-control">
+                        </div>
+                        <div class="form-group col-md-12">
+                            <button id="applyFiltersButton" class="btn btn-primary">Filter anwenden</button>
+                            <button id="clearFiltersButton" class="btn btn-secondary">Filter zurücksetzen</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--
         <div class="filter-container">
             <label for="filterLicensePlate">Kennzeichen</label>
             <select id="filterLicensePlate">
@@ -200,7 +258,6 @@
             <input type="date" id="filterDate">
             
             <div class="filter-container">
-                <!-- Existing filter options -->
                 <label for="filterStartDate">Startdatum</label>
                 <input type="date" id="filterStartDate">
             
@@ -211,6 +268,7 @@
             <button id="applyFiltersButton">Filter anwenden</button>
             <button id="clearFiltersButton">Filter zurücksetzen</button>
         </div>
+        -->
         
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Suchen...">
