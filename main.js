@@ -33,6 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const photoGuideText = document.getElementById('photoGuideText');
     const confirmImageButton = document.getElementById('confirmImageButton');
     const retakeImageButton = document.getElementById('retakeImageButton');
+    const toggleFiltersButton = document.getElementById('toggleFiltersButton');
+    const filterOptions = document.getElementById('filterOptions');
     const photoGuideSteps = [
         "Foto 1: Bitte mach ein Foto von dem Versandkarton",
         "Foto 2: Mache ein zweites Foto von dem Versandkarton (z.B. vom Versandetikett)",
@@ -60,6 +62,18 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         applyFilters();
     })
+
+    toggleFiltersButton.addEventListener('click', function() {
+        if (filterOptions.classList.contains('hidden')) {
+            filterOptions.classList.remove('hidden');
+            filterOptions.classList.add('show');
+            toggleFiltersButton.textContent = 'Filteroptionen ausblenden';
+        } else {
+            filterOptions.classList.remove('show');
+            filterOptions.classList.add('hidden');
+            toggleFiltersButton.textContent = 'Filteroptionen anzeigen';
+        }
+    });
 
 
     function initializeExcelSheet() {
