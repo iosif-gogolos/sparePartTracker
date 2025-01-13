@@ -626,6 +626,35 @@ h1.display-4 {
         width: auto;
         align-self: center;
     }
+
+    .search-container {
+        margin-top: 2rem; /* Add margin to ensure space between filter and search */
+    }
+
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .navbar-toggler {
+        margin-left: auto;
+    }
+
+    .brand-text {
+        display: inline-block;
+    }
+
+    .brand-text::after {
+        content: " ";
+        white-space: pre;
+    }
+
+    .brand-text::before {
+        content: "Station\n";
+        white-space: pre;
+    }
 }
 
 @media (max-width: 480px) {
@@ -636,5 +665,14 @@ h1.display-4 {
     .filter-container label, .filter-container input, .filter-container select, .filter-container button {
         font-size: 0.8rem;
         padding: 0.3rem 0.5rem;
+    }
+
+    .search-container {
+        margin-top: 2rem; /* Add margin to ensure space between filter and search */
+    }
+
+    header .navbar {
+        background-color: #003e70 !important;
+        font-size: 0.1rem;
     }
 }
