@@ -88,6 +88,14 @@ body {
     width: 100%; /* Ensure the text takes the full width */
 }
 
+.entry-form-container {
+    border: 2px solid #0056b3; /* Border color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
+    padding: 1.5rem; /* Padding inside the container */
+    background-color: #f9f9f9; /* Background color */
+    margin-bottom: 2rem; /* Margin below the container */
+}
 
 .partsTable {
     width: 100%;

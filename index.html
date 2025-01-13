@@ -168,6 +168,8 @@
         </div>
     
     <div class="container mt-4">
+        <h2 class="mb-4">Neuen Ersatzteil-Eintrag hinzufügen</h2>
+        <div class ="entry-form-container">
         <form id="addPartForm" class="form-container">
             <label for="licensePlate">Kennzeichen</label>
             <input type="text" id="licensePlate" placeholder="Kennzeichen" required>
@@ -193,7 +195,7 @@
                 <option value="Nein" selected>Nein</option>
             </select>
             <br>
-            
+        
             <!-- Fotoguide -->
             <label for="photo-guide">Fotos hinzufügen</label>
             <div id="imagePreviewContainer"></div>
@@ -217,25 +219,7 @@
             <button type="submit">Eintrag zur Liste hinzufügen</button>
             
         </form>      
-
-        <div class="pagination-container">
-            <label for="entriesPerPage">Einträge pro Seite</label>
-            <select id ="entriesPerPage">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-        </div>
-
-        <div class="pagination-controls">
-            <span id="pageInfo">Seite 1 von 1</span>
-            <button id="prevPageButton">Vorherige Seite</button>
-            <button id="nextPageButton">Nächste Seite</button>
-        </div>
-        <br>
-        
-        
+    </div>
         <div class="container mt-4">
             <div class="card">
                 <div class="card-header">
@@ -351,6 +335,21 @@
             <button id="clearSearchButton" class="hidden" title="Suche zurücksetzen">
                 <span class="material-icons">close</span>
             </button>
+        </div>
+        <div class="pagination-container">
+            <label for="entriesPerPage">Einträge pro Seite</label>
+            <select id ="entriesPerPage">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+
+        <div class="pagination-controls">
+            <span id="pageInfo">Seite 1 von 1</span>
+            <button id="prevPageButton">Vorherige Seite</button>
+            <button id="nextPageButton">Nächste Seite</button>
         </div>
 
         <div class="image-preview-overlay" id="imagePreviewOverlay">
