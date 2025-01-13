@@ -644,8 +644,8 @@ document.addEventListener('DOMContentLoaded', function() {
     searchButton.addEventListener('click', () => {
         const searchTerm = searchInput.value.toLowerCase();
         filteredParts = storedParts.filter(part => 
-            part.licensePlate.toLowerCase().includes(searchTerm) ||
-            part.partNumber.toLowerCase().includes(searchTerm)
+            part.licensePlate.toLowerCase().replace(/\s+/g, '').replace(/-/g, '').includes(searchTerm) ||
+        part.partNumber.toLowerCase().includes(searchTerm)
         );
         currentPage = 1;
         renderTable();
@@ -804,7 +804,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const endDateFilter = filterEndDate.value;
     
             filteredParts = storedParts.filter(part => {
-                const matchesLicensePlate = licensePlateFilter === '' || part.licensePlate.toLowerCase().includes(licensePlateFilter);
+                const matchesLicensePlate = licensePlateFilter === '' || part.licensePlate.toLowerCase().replace(/\s+/g, '').replace(/-/g, '').includes(licensePlateFilter);
                 const matchesPartNumber = partNumberFilter === '' || part.partNumber.toLowerCase().includes(partNumberFilter);
                 const matchesReason = reasonFilter === '' || part.reason === reasonFilter;
                 const matchesDescription = descriptionFilter === '' || part.description.toLowerCase().includes(descriptionFilter);
