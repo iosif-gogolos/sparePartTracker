@@ -56,6 +56,11 @@ document.addEventListener('DOMContentLoaded', function() {
     //let priceChart;
     let timeSeriesChart;
 
+    filterForm.addEventListener('submit', function(event){
+        event.preventDefault();
+        applyFilters();
+    })
+
 
     function initializeExcelSheet() {
         if (!localStorage.getItem('excelData')) {
@@ -485,7 +490,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const recommendationText = document.getElementById('recommendationText');
         if (openAmount > 1000) {
-            recommendationText.textContent = "Bitte auf Gutschriften im WAP achten und ggf. die Liste aktualisieren falls vorhanden um die offenen Beträge zu Beträge reduzieren.";
+            recommendationText.textContent = "Bitte auf Gutschriften im WAP achten und ggf. die Liste aktualisieren falls vorhanden um die offenen Beträge zu reduzieren.";
         } else {
             recommendationText.textContent = "Keine Empfehlungen verfügbar.";
         }
@@ -811,7 +816,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             filteredParts.sort((a, b) => new Date(a.complaintDate) - new Date(b.complaintDate));
 
-    
             currentPage = 1;
             renderTable();
         }
@@ -838,6 +842,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 licensePlateSet.add(part.licensePlate);
                 partNumberSet.add(part.partNumber);
                 reasonSet.add(part.reason);
+                descriptionSet.add(part.description);
             });
 
             const sortedLicensePlates = Array.from(licensePlateSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
@@ -865,6 +870,10 @@ document.addEventListener('DOMContentLoaded', function() {
             filterLicensePlate.value = '';
             filterPartNumber.value = '';
             filterReason.value = '';
+            filterDescription.value = '';
+            filterDate.value = '';
+            filterStartDate.value = '';
+            filterEndDate.value = '';
             filteredParts = storedParts;
             currentPage = 1;
             renderTable();

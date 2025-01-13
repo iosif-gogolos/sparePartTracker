@@ -19,7 +19,7 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
 
         <script src="main.js"></script>
         <script src="developerMode.js"></script>
@@ -58,10 +58,81 @@
         </div>
       </header>
     
-    
       
-    <div class="container">
-
+   <div class="container mt-4">
+    <div id="dashboard" class="hidden">
+        <h3 class="mb-4">Dashboard</h3>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-secondary shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title">Nicht retournierte Ersatzteile</h5>
+                                <p class="card-text" id="notReturnedCount">0</p>
+                            </div>
+                            <div>
+                                <i class="material-icons" style="font-size: 48px;">assignment_late</i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-danger shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title">Gesamtsumme freistehender Ersatzteile</h5>
+                                <p class="card-text" id="totalPrice">0 €</p>
+                            </div>
+                            <div>
+                                <i class="material-icons" style="font-size: 48px;">euro_symbol</i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-info shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title">Erfolgreich retournierte Ersatzteile</h5>
+                                <p class="card-text" id="returnedCount">0</p>
+                            </div>
+                            <div>
+                                <i class="material-icons" style="font-size: 48px;">check_circle</i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-success shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title">Summe retournierter Ersatzteile</h5>
+                                <p class="card-text" id="returnedPrice">0 €</p>
+                            </div>
+                            <div>
+                                <i class="material-icons" style="font-size: 48px;">swap_horiz</i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mt-4 shadow recommendation-card">
+            <div class="card-body">
+                <h5 class="card-title">Handlungsempfehlung</h5>
+                <p class="card-text" id="recommendationText">Keine Empfehlungen verfügbar.</p>
+            </div>
+        </div>
+    </div>
+</div>
+        <!--
         <div id="dashboard" class="hidden">
             <h3>Dashboard</h3>
             <div class="stats-grid">
@@ -82,7 +153,7 @@
                     <p id="returnedPrice">0 €</p>
                 </div>
             </div>
-            
+            -->
             <!-- <div id="chartsContainer">
                 <div id="timeSeriesChartContainer">
                     <canvas id="timeSeriesChart"></canvas>
@@ -94,10 +165,6 @@
             </div> -->
             
             <br>
-            <div id="recommendation" class="recommendation-box">
-                <h3>Handlungsempfehlung</h3>
-                <p id="recommendationText">Keine Empfehlungen verfügbar.</p>
-            </div>
         </div>
         
         <form id="addPartForm" class="form-container">
@@ -166,7 +233,7 @@
             <button id="nextPageButton">Nächste Seite</button>
         </div>
         <br>
-        <!--
+        
         <div class="container mt-4">
             <div class="card">
                 <div class="card-header">
@@ -226,7 +293,9 @@
                 </div>
             </div>
         </div>
-        -->
+        
+
+        <!--
         <div class="filter-container">
             <label for="filterLicensePlate">Kennzeichen</label>
             <select id="filterLicensePlate">
@@ -269,7 +338,7 @@
             <button id="applyFiltersButton">Filter anwenden</button>
             <button id="clearFiltersButton">Filter zurücksetzen</button>
         </div>
-        
+        -->
         
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Suchen...">
@@ -287,8 +356,8 @@
 
         </div>
 
-        <table id="partsTable" class="partsTable">
-            <thead>
+        <table id="partsTable" class="table table-striped table-bordered">
+            <thead class="thead-dark">
                 <tr>
                     <th>Kennzeichen</th>
                     <th>Teilenummer</th>
