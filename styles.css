@@ -492,8 +492,8 @@ h1.display-4 {
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 8px;
-    z-index: 1;
-    position: relative;
+    z-index: 1; /* Ensure the filter container is above other elements */
+    position: relative; /* Ensure the filter container is positioned correctly */
 }
 
 .filter-container label {
@@ -509,7 +509,7 @@ h1.display-4 {
 }
 
 .filter-container button {
-    background-color: #003e70;
+    background-color: #0056b3;
     color: white;
     border: none;
     cursor: pointer;
@@ -517,7 +517,7 @@ h1.display-4 {
 }
 
 .filter-container button:hover {
-    background-color: #0056b3;
+    background-color: #003e70;
 }
 
 
@@ -628,32 +628,7 @@ h1.display-4 {
     }
 
     .search-container {
-        margin-top: 2rem; /* Add margin to ensure space between filter and search */
-    }
-
-    .navbar-brand {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-    }
-
-    .navbar-toggler {
-        margin-left: auto;
-    }
-
-    .brand-text {
-        display: inline-block;
-    }
-
-    .brand-text::after {
-        content: " ";
-        white-space: pre;
-    }
-
-    .brand-text::before {
-        content: "Station\n";
-        white-space: pre;
+        margin-top: 2rem;
     }
 }
 
@@ -668,7 +643,7 @@ h1.display-4 {
     }
 
     .search-container {
-        margin-top: 2rem; /* Add margin to ensure space between filter and search */
+        margin-top: 2rem; 
     }
 
     header .navbar {
