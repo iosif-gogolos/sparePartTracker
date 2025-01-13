@@ -492,6 +492,8 @@ h1.display-4 {
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 8px;
+    z-index: 1;
+    position: relative;
 }
 
 .filter-container label {
@@ -514,7 +516,7 @@ h1.display-4 {
 }
 
 .filter-container button {
-    background-color: #0056b3;
+    background-color: #003e70;
     color: white;
     border: none;
     cursor: pointer;
@@ -522,7 +524,7 @@ h1.display-4 {
 }
 
 .filter-container button:hover {
-    background-color: #003e70;
+    background-color: #0056b3;
 }
 
 
@@ -619,6 +621,7 @@ h1.display-4 {
     .filter-container {
         flex-direction: column;
         align-items: flex-start;
+        margin-bottom: 2rem;
     }
 
     .filter-container label, .filter-container input, .filter-container select, .filter-container button {
