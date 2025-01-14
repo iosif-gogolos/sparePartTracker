@@ -224,101 +224,104 @@
 
         <br>
         
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Suchen...">
-            <button id="searchButton" title="Suchen">
-                <span class="material-icons">search</span>
-            </button>
-            <button id="clearSearchButton" class="hidden" title="Suche zurücksetzen">
-                <span class="material-icons">close</span>
-            </button>
-        </div>
-        <div class="pagination-container">
-            <label for="entriesPerPage">Einträge pro Seite</label>
-            <select id ="entriesPerPage">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-
-            <div class="pagination-controls">
-                <span id="pageInfo">Seite 1 von 1</span>
-                <button id="prevPageButton" class="btn btn-info mb-3">Vorherige Seite</button>
-                <button id="nextPageButton" class="btn btn-info mb-3">Nächste Seite</button>
-            </div>
-            <button id="toggleFiltersButton" class="btn btn-info mb-3">Filteroptionen anzeigen</button>
-        </div>
-
         
-        <div id="filterOptions" class="card filter-container hidden">
-                <div class="card-header">
-                    Filter
-                </div>
-                <div class="card-body">
-                    <form id="filterForm" class="form-row">
-                        <div class="form-group col-md-3">
-                            <label for="filterLicensePlate">Kennzeichen</label>
-                            <select id="filterLicensePlate" class="form-control">
-                                <option value="">Alle</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="filterPartNumber">Teilenummer</label>
-                            <select id="filterPartNumber" class="form-control">
-                                <option value="">Alle</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="filterDescription">Artikelname</label>
-                            <select id="filterDescription" class="form-control">
-                                <option value="">Alle</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="filterReason">Grund der Retoure</label>
-                            <select id="filterReason" class="form-control">
-                                <option value="">Alle</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="filterRetoureLabelReceived">Retourelabel erhalten</label>
-                            <select id="filterRetoureLabelReceived" class="form-control">
-                                <option value="">Alle</option>
-                                <option value="Ja">Ja</option>
-                                <option value="Nein">Nein</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="filterDate">Reklamationsdatum</label>
-                            <input type="date" id="filterDate" class="form-control">
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="filterStartDate">Startdatum</label>
-                            <input type="date" id="filterStartDate" class="form-control">
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="filterEndDate">Enddatum</label>
-                            <input type="date" id="filterEndDate" class="form-control">
-                        </div>
-                        <div class="form-group col-md-12">
-                            <button id="applyFiltersButton" class="btn btn-primary">Filter anwenden</button>
-                            <button id="clearFiltersButton" class="btn btn-secondary">Filter zurücksetzen</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="image-preview-overlay" id="imagePreviewOverlay">
-            <button class="close-button" id="closePreviewButton">&times;</button>
-            <img id="previewImage" src="" alt="Preview image">
-
-        </div>
 
         
         <div class="container mt-4">
             <h2 class="mb-4">Liste der retournierten Ersatzteile</h2>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Suchen...">
+                <button id="searchButton" title="Suchen">
+                    <span class="material-icons">search</span>
+                </button>
+                <button id="clearSearchButton" class="hidden" title="Suche zurücksetzen">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="pagination-container">
+                <div class="entries-per-page-container">
+                    <label for="entriesPerPage">Einträge pro Seite: </label>
+                    <select id ="entriesPerPage">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+    
+                <div class="pagination-controls">
+                    <span id="pageInfo">Seite 1 von 1</span>
+                    <button id="prevPageButton" class="btn btn-info mb-3">Vorherige Seite</button>
+                    <button id="nextPageButton" class="btn btn-info mb-3">Nächste Seite</button>
+                </div>
+                <button id="toggleFiltersButton" class="btn btn-info mb-3">Filteroptionen anzeigen</button>
+            </div>
+    
+            
+            <div id="filterOptions" class="card filter-container hidden">
+                    <div class="card-header">
+                        Filter
+                    </div>
+                    <div class="card-body">
+                        <form id="filterForm" class="form-row">
+                            <div class="form-group col-md-3">
+                                <label for="filterLicensePlate">Kennzeichen</label>
+                                <select id="filterLicensePlate" class="form-control">
+                                    <option value="">Alle</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="filterPartNumber">Teilenummer</label>
+                                <select id="filterPartNumber" class="form-control">
+                                    <option value="">Alle</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="filterDescription">Artikelname</label>
+                                <select id="filterDescription" class="form-control">
+                                    <option value="">Alle</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="filterReason">Grund der Retoure</label>
+                                <select id="filterReason" class="form-control">
+                                    <option value="">Alle</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="filterRetoureLabelReceived">Retourelabel erhalten</label>
+                                <select id="filterRetoureLabelReceived" class="form-control">
+                                    <option value="">Alle</option>
+                                    <option value="Ja">Ja</option>
+                                    <option value="Nein">Nein</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="filterDate">Reklamationsdatum</label>
+                                <input type="date" id="filterDate" class="form-control">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="filterStartDate">Startdatum</label>
+                                <input type="date" id="filterStartDate" class="form-control">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="filterEndDate">Enddatum</label>
+                                <input type="date" id="filterEndDate" class="form-control">
+                            </div>
+                            <div class="form-group col-md-12">
+                                <button id="applyFiltersButton" class="btn btn-primary">Filter anwenden</button>
+                                <button id="clearFiltersButton" class="btn btn-secondary">Filter zurücksetzen</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="image-preview-overlay" id="imagePreviewOverlay">
+                <button class="close-button" id="closePreviewButton">&times;</button>
+                <img id="previewImage" src="" alt="Preview image">
+    
+            </div>
         <table id="partsTable" class="table table-striped table-bordered">
             <thead class="thead-dark">
                 <tr>
