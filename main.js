@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const start = (currentPage - 1) * entriesPerPage;
         const end = start + entriesPerPage;
         const partsToDisplay = filteredParts.slice(start, end);
-    
+
         partsToDisplay.forEach(addPartToTable);
         updatePaginationButtons();
     }
@@ -818,10 +818,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const endDateFilter = filterEndDate.value;
     
             filteredParts = storedParts.filter(part => {
-                const matchesLicensePlate = licensePlateFilter === '' || part.licensePlate.toLowerCase().replace(/\s+/g, '').replace(/-/g, '').includes(licensePlateFilter);
-                const matchesPartNumber = partNumberFilter === '' || part.partNumber.toLowerCase().includes(partNumberFilter);
+                const matchesLicensePlate = part.licensePlate.toLowerCase().includes(licensePlateFilter);
+                const matchesPartNumber = part.partNumber.toLowerCase().includes(partNumberFilter);
                 const matchesReason = reasonFilter === '' || part.reason === reasonFilter;
-                const matchesDescription = descriptionFilter === '' || part.description.toLowerCase().includes(descriptionFilter);
+                const matchesDescription = part.description.toLowerCase().includes(descriptionFilter);
                 const matchesDate = dateFilter === '' || part.complaintDate === dateFilter;
                 const matchesStartDate = startDateFilter === '' || new Date(part.complaintDate) >= new Date(startDateFilter);
                 const matchesEndDate = endDateFilter === '' || new Date(part.complaintDate) <= new Date(endDateFilter);
@@ -897,7 +897,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeExcelSheet();
         loadPartsFromStorage();
         updateFilterOptions();
-        //updateCharts();
+        //updateCharts(); //this is for later
         updateDashboard();
         updateClearButtonVisibility();
         
