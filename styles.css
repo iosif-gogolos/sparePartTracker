@@ -107,18 +107,23 @@ body {
 .partsTable {
     width: 100%;
     border-collapse: collapse;
-    margin: 1rem 0;
+    margin: 1rem 0rem;
+}
+
+
+.partsTable th {
+    background-color: #003e70;
+    color: white;
+    text-transform: uppercase;
 }
 
 .partsTable th, .partsTable td {
     border: 1px solid #ddd;
     padding: 0.5rem;
     text-align: left;
+    
 }
 
-.partsTable th {
-    background-color: #f4f4f4;
-}
 
 /* Zebra-Streifen-Effekt */
 .partsTable tbody tr:nth-child(odd) {
@@ -283,6 +288,8 @@ th {
 
 #toggleFiltersButton {
     margin-left: 1;
+    margin-top: 1rem;
+
 }
 
 .pagination-controls {
@@ -621,6 +628,15 @@ h1.display-4 {
     text-decoration: none;
     cursor: pointer;
 }
+
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 1rem;
+    font-family: Arial, sans-serif;
+}
+
 
 /* Media Queries */
 

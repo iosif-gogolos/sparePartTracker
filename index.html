@@ -220,23 +220,17 @@
             
         </form>      
     </div>
-    
-
-        <br>
-        
-        
-
-        
         <div class="container mt-4">
             <h2 class="mb-4">Liste der retournierten Ersatzteile</h2>
             <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Suchen...">
+                <input type="text" id="searchInput" placeholder="Eintrag suchen...">
                 <button id="searchButton" title="Suchen">
                     <span class="material-icons">search</span>
                 </button>
                 <button id="clearSearchButton" class="hidden" title="Suche zurücksetzen">
                     <span class="material-icons">close</span>
                 </button>
+                
             </div>
             <div class="pagination-container">
                 <div class="entries-per-page-container">
@@ -254,9 +248,10 @@
                     <button id="prevPageButton" class="btn btn-info mb-3">Vorherige Seite</button>
                     <button id="nextPageButton" class="btn btn-info mb-3">Nächste Seite</button>
                 </div>
-                <button id="toggleFiltersButton" class="btn btn-info mb-3">Filteroptionen anzeigen</button>
+                
             </div>
-    
+            
+            <button id="toggleFiltersButton" class="btn btn-info mb-3">Filteroptionen anzeigen</button>
             
             <div id="filterOptions" class="card filter-container hidden">
                     <div class="card-header">
@@ -323,7 +318,7 @@
     
             </div>
         <table id="partsTable" class="table table-striped table-bordered">
-            <thead class="thead-dark">
+            <thead class="partsTable">
                 <tr>
                     <th>Kennzeichen</th>
                     <th>Teilenummer</th>
@@ -340,8 +335,6 @@
                 <!-- Dynamische Inhalte werden hier hinzugefügt -->
             </tbody>
         </table>
-
-        
 
         <button id="exportButton" class="hidden" >Liste Exportieren</button>    
 
