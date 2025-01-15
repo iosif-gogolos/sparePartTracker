@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterEndDate = document.getElementById('filterEndDate');
 
 
+    const scrollToTableDiv = document.getElementById('scrollToTableDiv');
+    const partsTable = document.getElementById('partsTable');
     const partsTableBody = document.querySelector('#partsTable tbody');
     const exportButton = document.getElementById('exportButton');
     const addButton = addPartForm.querySelector('button[type="submit"]');
@@ -30,11 +32,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const imagePreviewOverlay = document.getElementById('imagePreviewOverlay');
     const previewImage = document.getElementById('previewImage');
     const closePreviewButton = document.getElementById('closePreviewButton');
-    const photoGuideText = document.getElementById('photoGuideText');
     const confirmImageButton = document.getElementById('confirmImageButton');
     const retakeImageButton = document.getElementById('retakeImageButton');
-    const toggleFiltersButton = document.getElementById('toggleFiltersButton');
-    const filterOptions = document.getElementById('filterOptions');
+    const photoGuideText = document.getElementById('photoGuideText');
     const photoGuideSteps = [
         "Foto 1: Bitte mach ein Foto von dem Versandkarton",
         "Foto 2: Mache ein zweites Foto von dem Versandkarton (z.B. vom Versandetikett)",
@@ -62,6 +62,10 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         applyFilters();
     })
+
+    scrollToTableDiv.addEventListener('click', function() {
+        partsTable.scrollIntoView({ behavior: 'smooth' });
+    });
 
     toggleFiltersButton.addEventListener('click', function() {
         if (filterOptions.classList.contains('hidden')) {
@@ -98,56 +102,8 @@ document.addEventListener('DOMContentLoaded', function() {
         files.forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    const maxWidth = 800; // Set the maximum width
-                    const maxHeight = 600; // Set the maximum height
-                    let width = img.width;
-                    let height = img.height;
-
-                    // Calculate the new dimensions while maintaining the aspect ratio
-                    if (width > height) {
-                        if (width > maxWidth) {
-                            height = Math.round((height *= maxWidth / width));
-                            width = maxWidth;
-                        }
-                    } else {
-                        if (height > maxHeight) {
-                            width = Math.round((width *= maxHeight / height));
-                            height = maxHeight;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    canvas.toBlob((blob) => {
-                        const compressedReader = new FileReader();
-                        compressedReader.onload = (event) => {
-                            const compressedImg = document.createElement('div');
-                            compressedImg.classList.add('image-preview');
-                            compressedImg.innerHTML = `
-                                <img src="${event.target.result}" alt="Preview">
-                                <button class="remove-button" data-index="${index}">&times;</button>
-                            `;
-                            imagePreviewContainer.appendChild(compressedImg);
-                            imageFiles.push(event.target.result);
-
-                            // Update photo guide step
-                            currentStep++;
-                            if (currentStep < photoGuideSteps.length) {
-                                photoGuideText.textContent = photoGuideSteps[currentStep];
-                            } else {
-                                photoGuideText.textContent = "Alle Fotos aufgenommen.";
-                            }
-                        };
-                        compressedReader.readAsDataURL(blob);
-                    }, 'image/jpeg', 0.7); // Adjust the quality as needed
-                };
-                img.src = e.target.result;
+                previewImage.src = e.target.result;
+                imagePreviewOverlay.style.display = 'block';
             };
             reader.readAsDataURL(file);
         });
@@ -299,18 +255,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderImagePreviews() {
         imagePreviewContainer.innerHTML = '';
-        imageFiles.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = document.createElement('div');
-                img.classList.add('image-preview');
-                img.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview">
-                    <button class="remove-button" data-index="${index}">&times;</button>
-                `;
-                imagePreviewContainer.appendChild(img);
-            };
-            reader.readAsDataURL(file);
+        imageFiles.forEach((src, index) => {
+            const img = document.createElement('div');
+            img.classList.add('image-preview');
+            img.innerHTML = `
+                <img src="${src}" alt="Preview">
+                <button class="remove-button" data-index="${index}">&times;</button>
+            `;
+            imagePreviewContainer.appendChild(img);
         });
     }
     

@@ -66,6 +66,19 @@ body {
     font-weight: bold;
 }
 
+.clickable {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.clickable:hover{
+    background-color: #a1afba;
+}
+
+.clickable:active {
+    background-color: #4e555b;
+}
+
 .recommendation-card {
     background-color: #e6f7ff;
     border-left: 4px solid #003e70;
