@@ -147,6 +147,11 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 photoGuideText.textContent = "Alle Fotos aufgenommen.";
             }
+            // Aktualisiere die Indizes der verbleibenden Bilder
+            const removeButtons = imagePreviewContainer.querySelectorAll('.remove-button');
+            removeButtons.forEach((button, idx) => {
+                button.setAttribute('data-index', idx);
+            });
         }
     });
 
@@ -221,25 +226,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 </button>
             </td>
         `;
-
+    
         newRow.querySelector('.delete-btn').addEventListener('click', () => {
             if (confirm(`Achtung\!\!\! \n \n Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`)) {
                 removePartFromTable(part.id);
             }
         });
-
+    
         newRow.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
-
+    
         newRow.querySelector('.view-images-btn').addEventListener('click', () => {
             if (!part.images || part.images.length === 0) {
-                if (confirm("Es wurden noch keine Bilder hinzugefügt. Möchten Sie jetzt Bilder hinzufügen?")) {
-                    partImagesInput.click();
-                }
+                alert('Keine Bilder verfügbar.');
             } else {
                 viewImages(part.images);
             }
         });
-
+    
         partsTableBody.appendChild(newRow);
     }
 
