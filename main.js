@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
     
         newRow.querySelector('.delete-btn').addEventListener('click', () => {
-            if (confirm(`Achtung\!\!\! \n \n Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`)) {
+            if (confirm(`Achtung! Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`)) {
                 removePartFromTable(part.id);
             }
         });
@@ -356,11 +356,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function savePartToStorage(part) {
+        const storedParts = JSON.parse(localStorage.getItem('partsData')) || [];
         storedParts.push(part);
         localStorage.setItem('partsData', JSON.stringify(storedParts));
         filteredParts = storedParts;
         renderTable();
-        updateFilterOptions();
         updateClearButtonVisibility();
         updateDashboard(); // Aktualisiere die Metriken und Handlungsempfehlungen
     }
@@ -658,7 +658,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const partFolder = imagesFolder.folder(partFolderName);
             part.images.forEach((image, index) => {
                 const base64Data = image.split(',')[1];
-                partFolder.file(`Bild-${index + 1}.jpg`, base64Data, { base64: true });
+                const binaryData = atob(base64Data);
+                const arrayBuffer = new ArrayBuffer(binaryData.length);
+                const uint8Array = new Uint8Array(arrayBuffer);
+                for (let i = 0; i < binaryData.length; i++) {
+                    uint8Array[i] = binaryData.charCodeAt(i);
+                }
+                partFolder.file(`image${index + 1}.png`, uint8Array, { binary: true });
             });
         });
     
