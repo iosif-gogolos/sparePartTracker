@@ -206,7 +206,7 @@
                 <button type="button" id="uploadImagesButton">Bilder hinzufügen</button>
             </div>
             <input type="file" id="partImages" accept="image/*" capture="environment" multiple class="hidden">
-            <!-- Bildvorschau-Overlay -->
+            <!-- Bildvorschau-Overlay für die Erstellung eines Eintrags -->
             <div class="image-preview-overlay" id="imagePreviewOverlay">
                 <button class="close-button" id="closePreviewButton">&times;</button>
                 <img id="previewImage" src="" alt="Preview image">
@@ -214,7 +214,22 @@
                     <button id="confirmImageButton">Bild bestätigen</button>
                     <button id="retakeImageButton">Bild erneut aufnehmen</button>
                 </div>
+                <div>
+                    <button id="prevImageButton">Vorheriges Bild</button>
+                    <button id="nextImageButton">Nächstes Bild</button>
+                </div>
             </div>
+
+            <!-- Bildvorschau-Overlay für die Anzeige der Bilder aus einem Eintrag -->
+            <div class="entry-image-preview-overlay" id="entryImagePreviewOverlay">
+                <button class="close-button" id="closeEntryPreviewButton">&times;</button>
+                <img id="entryPreviewImage" src="" alt="Preview image">
+                <div>
+                    <button id="prevEntryImageButton">Vorheriges Bild</button>
+                    <button id="nextEntryImageButton">Nächstes Bild</button>
+                </div>
+            </div>
+            
             <br>
             <button type="submit">Eintrag zur Liste hinzufügen</button>
             

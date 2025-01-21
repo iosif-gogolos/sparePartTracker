@@ -32,6 +32,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const imagePreviewOverlay = document.getElementById('imagePreviewOverlay');
     const previewImage = document.getElementById('previewImage');
     const closePreviewButton = document.getElementById('closePreviewButton');
+    const prevImageButton = document.getElementById('prevImageButton');
+    const nextImageButton = document.getElementById('nextImageButton');
+    let currentImageIndex = 0;
+    let currentImages = [];
+
+    const entryImagePreviewOverlay = document.getElementById('entryImagePreviewOverlay');
+    const entryPreviewImage = document.getElementById('entryPreviewImage');
+    const closeEntryPreviewButton = document.getElementById('closeEntryPreviewButton');
+    const prevEntryImageButton = document.getElementById('prevEntryImageButton');
+    const nextEntryImageButton = document.getElementById('nextEntryImageButton');
+    let currentEntryImageIndex = 0;
+    let currentEntryImages = [];
+
     const confirmImageButton = document.getElementById('confirmImageButton');
     const retakeImageButton = document.getElementById('retakeImageButton');
     const photoGuideText = document.getElementById('photoGuideText');
@@ -57,6 +70,72 @@ document.addEventListener('DOMContentLoaded', function() {
     let partsChart;
     //let priceChart;
     let timeSeriesChart;
+
+    function showImageOverlay(images, index) {
+        currentImages = images;
+        currentImageIndex = index;
+        previewImage.src = currentImages[currentImageIndex];
+        imagePreviewOverlay.style.display = 'flex';
+    }
+
+    function showEntryImageOverlay(images, index) {
+        currentEntryImages = images;
+        currentEntryImageIndex = index;
+        entryPreviewImage.src = currentEntryImages[currentEntryImageIndex];
+        entryImagePreviewOverlay.style.display = 'flex';
+    }
+
+    function updateImage() {
+        previewImage.src = currentImages[currentImageIndex];
+    }
+
+    function updateEntryImage() {
+        entryPreviewImage.src = currentEntryImages[currentEntryImageIndex];
+    }
+
+    closePreviewButton.addEventListener('click', () => {
+        imagePreviewOverlay.style.display = 'none';
+    });
+
+    closeEntryPreviewButton.addEventListener('click', () => {
+        entryImagePreviewOverlay.style.display = 'none';
+    });
+
+    prevImageButton.addEventListener('click', () => {
+        if (currentImageIndex > 0) {
+            currentImageIndex--;
+            updateImage();
+        }
+    });
+
+    nextImageButton.addEventListener('click', () => {
+        if (currentImageIndex < currentImages.length - 1) {
+            currentImageIndex++;
+            updateImage();
+        }
+    });
+
+    prevEntryImageButton.addEventListener('click', () => {
+        if (currentEntryImageIndex > 0) {
+            currentEntryImageIndex--;
+            updateEntryImage();
+        }
+    });
+
+    nextEntryImageButton.addEventListener('click', () => {
+        if (currentEntryImageIndex < currentEntryImages.length - 1) {
+            currentEntryImageIndex++;
+            updateEntryImage();
+        }
+    });
+
+    function viewImages(images) {
+        showImageOverlay(images, 0);
+    }
+
+    function viewEntryImages(images) {
+        showEntryImageOverlay(images, 0);
+    }
 
     filterForm.addEventListener('submit', function(event){
         event.preventDefault();
@@ -136,6 +215,10 @@ document.addEventListener('DOMContentLoaded', function() {
         imagePreviewOverlay.style.display = 'none';
     });
 
+    closeEntryPreviewButton.addEventListener('click', () => {
+        entryImagePreviewOverlay.style.display = 'none';
+    });
+
     imagePreviewContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('remove-button')) {
             const index = e.target.getAttribute('data-index');
@@ -168,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
             price: document.getElementById('price').value,
             remarks: document.getElementById('remarks').value,
             retoureLabelReceived: document.getElementById('retoureLabelReceived').value || "Nein",
-            images: imageFiles // Assign the images array directly
+            images: imageFiles// Assign the images array directly
         };
 
         console.log('Adding new part:', newPart); // Log the new part for debugging
@@ -226,23 +309,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 </button>
             </td>
         `;
-    
+
         newRow.querySelector('.delete-btn').addEventListener('click', () => {
             if (confirm(`Achtung! Sind Sie sicher, dass Sie den Eintrag mit dem Kennzeichen "${part.licensePlate}" löschen wollen?`)) {
                 removePartFromTable(part.id);
             }
         });
-    
+
         newRow.querySelector('.edit-btn').addEventListener('click', () => loadPartToForm(part));
-    
+
         newRow.querySelector('.view-images-btn').addEventListener('click', () => {
             if (!part.images || part.images.length === 0) {
                 alert('Keine Bilder verfügbar.');
             } else {
-                viewImages(part.images);
+                viewEntryImages(part.images);
             }
         });
-    
+
         partsTableBody.appendChild(newRow);
     }
 
@@ -634,7 +717,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const folderName = `Retoure-Ersatzteil-${new Date().toLocaleDateString('de-DE')}`;
         const mainFolder = zip.folder(folderName);
         const imagesFolder = mainFolder.folder('Bilder');
-    
+
         // Erstellen einer Kopie der Daten ohne die `images`-Eigenschaft und ohne leere `id`-Eigenschaft
         const dataWithoutImages = storedParts.map(({ images, id, ...rest }) => {
             // Filtere die `id`-Eigenschaft nur ein, wenn sie nicht leer ist
@@ -644,14 +727,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             return filteredData;
         });
-    
+
         // Exportiere die Liste als XLSX
         const worksheet = XLSX.utils.json_to_sheet(dataWithoutImages);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Liste');
         const xlsxData = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
         mainFolder.file('Liste.xlsx', xlsxData);
-    
+
         // Füge die Bilder hinzu
         storedParts.forEach(part => {
             const partFolderName = `${part.licensePlate}-${part.partNumber}-${new Date(part.complaintDate).toLocaleDateString('de-DE')}`;
@@ -667,7 +750,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 partFolder.file(`image${index + 1}.png`, uint8Array, { binary: true });
             });
         });
-    
+
         // Generiere das ZIP-Archiv und speichere es
         zip.generateAsync({ type: 'blob' }).then(content => {
             saveAs(content, `${folderName}.zip`);

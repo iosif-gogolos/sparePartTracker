@@ -400,9 +400,11 @@ th {
     justify-content: center;
 }
 
-.image-preview-overlay {
+.image-preview-overlay,
+.entry-image-preview-overlay  {
     position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
@@ -413,12 +415,14 @@ th {
     display: none;
 }
 
-.image-preview-overlay img {
+.image-preview-overlay img,
+.entry-image-preview-overlay img  {
     max-width: 90%;
     max-height: 90%;
 }
 
-.image-preview-overlay .close-button {
+.image-preview-overlay .close-button,
+.entry-image-preview-overlay .close-button  {
     position: absolute;
     top: 20px;
     right: 20px;
@@ -426,6 +430,29 @@ th {
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
+}
+
+.image-preview-overlay .close-button:hover,
+.entry-image-preview-overlay .close-button:hover {
+    background-color: #2c2fe5;
+}
+
+.image-preview-overlay button,
+.entry-image-preview-overlay button {
+    background-color: #003e70;
+    color: rgb(18, 21, 168);
+    border: none;
+    padding: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 0 0.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.image-preview-overlay button:hover,
+.entry-image-preview-overlay button:hover {
+    background-color: #0056b3;
 }
 
 
